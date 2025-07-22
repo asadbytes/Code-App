@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation
+package com.asadbyte.codeapp.presentation.scanner
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import java.net.URLDecoder
 
 @Composable
-fun ResultScreen(bitmap: Bitmap, scannedContent: String, onNavigateBack: () -> Unit) {
+fun ScannerResultScreen(bitmap: Bitmap, scannedContent: String, onNavigateBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
