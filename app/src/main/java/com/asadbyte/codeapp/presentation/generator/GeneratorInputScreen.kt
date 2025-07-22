@@ -9,12 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun GeneratorInputScreen(
     onQrCodeGenerated: (Bitmap) -> Unit,
-    generatorViewModel: GeneratorViewModel = viewModel()
+    generatorViewModel: GeneratorViewModel = hiltViewModel()
 ) {
     val text by generatorViewModel.inputText.collectAsState()
 

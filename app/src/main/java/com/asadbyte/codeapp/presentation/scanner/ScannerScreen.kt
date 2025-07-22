@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.asadbyte.codeapp.domain.QRScanner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun ScannerScreen(
     onResult: (Bitmap, String) -> Unit,
-    scannerViewModel: ScannerViewModel = viewModel()
+    scannerViewModel: ScannerViewModel = hiltViewModel()
 ) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val context = LocalContext.current

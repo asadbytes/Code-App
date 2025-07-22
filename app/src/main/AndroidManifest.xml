@@ -7,6 +7,7 @@
     <!-- Declare that the app uses the camera feature -->
     <uses-feature android:name="android.hardware.camera.any" />
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
