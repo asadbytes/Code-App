@@ -71,4 +71,7 @@ dependencies {
 
     // Accompanist for Permissions (optional but helpful)
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+    // compose navigation
+    implementation("androidx.navigation:navigation-compose:2.7.6")
 }
