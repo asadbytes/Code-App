@@ -1,5 +1,6 @@
 package com.asadbyte.codeapp.presentation.history
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,16 +19,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.data.HistoryItem
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HistoryScreen(
-    historyViewModel: HistoryViewModel = hiltViewModel(),
+    viewModel: HistoryViewModel = hiltViewModel(),
     onItemClick: (HistoryItem) -> Unit
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val historyItems by historyViewModel.history.collectAsState()
-    val favoriteItems by historyViewModel.favorites.collectAsState()
+    // 1. Create PagerState to control the swiping behavior (2 pages: "All" and "Favorites")
+    val pagerState = rememberPagerState { 2 }
+    val coroutineScope = rememberCoroutineScope()
+
+    val historyItems by viewModel.history.collectAsState()
+    val favoriteItems by viewModel.favorites.collectAsState()
 
     Scaffold(
         topBar = {
@@ -35,32 +42,47 @@ fun HistoryScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            TabRow(selectedTabIndex = selectedTab) {
+            // 2. Link the TabRow to the PagerState
+            TabRow(selectedTabIndex = pagerState.currentPage) {
                 Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
+                    selected = pagerState.currentPage == 0,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(0)
+                        }
+                    },
                     text = { Text("All") }
                 )
                 Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
+                    selected = pagerState.currentPage == 1,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(1)
+                        }
+                    },
                     text = { Text("Favorites") }
                 )
             }
 
-            when (selectedTab) {
-                0 -> HistoryList(
-                    items = historyItems,
-                    onItemClick = onItemClick,
-                    onToggleFavorite = { historyViewModel.toggleFavorite(it) },
-                    onDeleteItem = { historyViewModel.deleteItem(it) }
-                )
-                1 -> HistoryList(
-                    items = favoriteItems,
-                    onItemClick = onItemClick,
-                    onToggleFavorite = { historyViewModel.toggleFavorite(it) },
-                    onDeleteItem = { historyViewModel.deleteItem(it) }
-                )
+            // 3. Use HorizontalPager to create the swipeable content area
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> HistoryList(
+                        items = historyItems,
+                        onItemClick = onItemClick,
+                        onToggleFavorite = { viewModel.toggleFavorite(it) },
+                        onDeleteItem = { viewModel.deleteItem(it) }
+                    )
+                    1 -> HistoryList(
+                        items = favoriteItems,
+                        onItemClick = onItemClick,
+                        onToggleFavorite = { viewModel.toggleFavorite(it) },
+                        onDeleteItem = { viewModel.deleteItem(it) }
+                    )
+                }
             }
         }
     }
@@ -83,7 +105,7 @@ fun HistoryList(
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(items, key = { it.id }) { item ->
             HistoryRow(item, onItemClick, onToggleFavorite, onDeleteItem)
-            HorizontalDivider()
+            Divider()
         }
     }
 }
