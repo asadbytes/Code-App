@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SplashScreen.ComposeSplash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/gray_333</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_qrcode_splash</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="postSplashScreenTheme">@style/Theme.CodeApp</item>
+    </style>
+</resources>

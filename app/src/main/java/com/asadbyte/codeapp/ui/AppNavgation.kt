@@ -26,6 +26,7 @@ import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerScreen
+import com.asadbyte.codeapp.ui.splash.MySplashScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
