@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation.history
+package com.asadbyte.codeapp.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

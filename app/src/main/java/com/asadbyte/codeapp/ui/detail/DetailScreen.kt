@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation.detail
+package com.asadbyte.codeapp.ui.detail
 
 import android.content.Context
 import android.content.Intent
@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
-import com.asadbyte.codeapp.presentation.generator.GeneratorViewModel
+import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

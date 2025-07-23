@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation
+package com.asadbyte.codeapp.ui
 
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
@@ -20,15 +20,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.asadbyte.codeapp.R
-import com.asadbyte.codeapp.presentation.detail.DetailScreen
-import com.asadbyte.codeapp.presentation.generator.GeneratorInputScreen
-import com.asadbyte.codeapp.presentation.generator.GeneratorResultScreen
-import com.asadbyte.codeapp.presentation.generator.GeneratorViewModel
-import com.asadbyte.codeapp.presentation.history.HistoryScreen
-import com.asadbyte.codeapp.presentation.history.HistoryViewModel
-import com.asadbyte.codeapp.presentation.scanner.ScannerResultScreen
-import com.asadbyte.codeapp.presentation.scanner.ScannerScreen
-import com.asadbyte.codeapp.presentation.scanner.ScannerViewModel
+import com.asadbyte.codeapp.ui.detail.DetailScreen
+import com.asadbyte.codeapp.ui.generator.GeneratorInputScreen
+import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
+import com.asadbyte.codeapp.ui.history.HistoryScreen
+import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
+import com.asadbyte.codeapp.ui.scanner.ScannerScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 

@@ -4,10 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.asadbyte.codeapp.data.AppDatabase
 import com.asadbyte.codeapp.data.HistoryDao
-import com.asadbyte.codeapp.data.HistoryRepository
-import com.asadbyte.codeapp.presentation.generator.GeneratorViewModel
-import com.asadbyte.codeapp.presentation.history.HistoryViewModel
-import com.asadbyte.codeapp.presentation.scanner.ScannerViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

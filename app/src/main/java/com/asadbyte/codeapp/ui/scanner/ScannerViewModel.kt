@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation.scanner
+package com.asadbyte.codeapp.ui.scanner
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel

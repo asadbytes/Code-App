@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.presentation.generator
+package com.asadbyte.codeapp.ui.generator
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
