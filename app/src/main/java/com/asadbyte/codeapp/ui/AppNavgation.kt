@@ -26,6 +26,7 @@ import com.asadbyte.codeapp.ui.detail.DetailScreen
 import com.asadbyte.codeapp.ui.generator.GenerateHome
 import com.asadbyte.codeapp.ui.generator.GeneratorInputScreen
 import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
+import com.asadbyte.codeapp.ui.history.HistoryHomeNew
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerScreen
@@ -151,12 +152,16 @@ fun AppNavigation() {
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
-                HistoryScreen(
+                /*HistoryScreen(
                     onItemClick = { item ->
                         // URL-encode the content to handle special characters safely
                         val encodedContent = URLEncoder.encode(item.content, "UTF-8")
                         navController.navigate("detail/$encodedContent")
                     }
+                )*/
+                HistoryHomeNew(
+                    onSettingsClick = { /* Handle settings click */ },
+                    navController = navController
                 )
             }
         }
