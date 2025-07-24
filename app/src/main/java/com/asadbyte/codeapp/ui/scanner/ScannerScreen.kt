@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,15 +39,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.domain.QRScanner
+import com.asadbyte.codeapp.ui.theme.CodeAppTheme
+import com.asadbyte.codeapp.ui.theme.Gray30
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -109,42 +116,51 @@ fun ScannerScreen(
             ScannerOverlay(modifier = Modifier.fillMaxSize())
 
             // Control buttons overlay
-            Row(
+            Surface(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround
+                    .size(500.dp, 100.dp)
+                    .padding(vertical = 16.dp, horizontal = 20.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color.Red)
             ) {
-                IconButton(
-                    onClick = { imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Gray30)
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
                 ) {
-                    Icon(painterResource(R.drawable.ic_imagesmode), contentDescription = "Scan from Gallery", tint = Color.White)
-                }
-                IconButton(
-                    onClick = {
-                        isFlashOn = !isFlashOn
-                        qrScanner.toggleFlash(isFlashOn)
-                    },
-                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                ) {
-                    val icon = if (isFlashOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off
-                    Icon(painterResource(icon), contentDescription = "Toggle Flashlight", tint = Color.White)
-                }
-                IconButton(
-                    onClick = {
-                        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                            CameraSelector.DEFAULT_FRONT_CAMERA
-                        } else {
-                            CameraSelector.DEFAULT_BACK_CAMERA
-                        }
-                        isFlashOn = false
-                        qrScanner.toggleFlash(false)
-                    },
-                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                ) {
-                    Icon(painterResource(R.drawable.ic_flip_camera), contentDescription = "Switch Camera", tint = Color.White)
+                    IconButton(
+                        onClick = { imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        Icon(painterResource(R.drawable.ic_imagesmode), contentDescription = "Scan from Gallery", tint = Color.White)
+                    }
+                    IconButton(
+                        onClick = {
+                            isFlashOn = !isFlashOn
+                            qrScanner.toggleFlash(isFlashOn)
+                        },
+                        modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        val icon = if (isFlashOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+                        Icon(painterResource(icon), contentDescription = "Toggle Flashlight", tint = Color.White)
+                    }
+                    IconButton(
+                        onClick = {
+                            cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                                CameraSelector.DEFAULT_FRONT_CAMERA
+                            } else {
+                                CameraSelector.DEFAULT_BACK_CAMERA
+                            }
+                            isFlashOn = false
+                            qrScanner.toggleFlash(false)
+                        },
+                        modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        Icon(painterResource(R.drawable.ic_flip_camera), contentDescription = "Switch Camera", tint = Color.White)
+                    }
                 }
             }
 

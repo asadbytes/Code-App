@@ -2,6 +2,7 @@ package com.asadbyte.codeapp.ui.splash
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -14,8 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
+import com.asadbyte.codeapp.ui.theme.Gray30
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QrCodeMain(
     onGenerateClick: () -> Unit,
@@ -27,13 +28,11 @@ fun QrCodeMain(
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(title = { Text(text = "Home") })
-            },
             bottomBar = {
                 FixedBottomBar(
                     onGenerateClick = { onGenerateClick() },
-                    onHistoryClick = { onHistoryClick() }
+                    onHistoryClick = { onHistoryClick() },
+                    modifier = Modifier.background(Gray30)
                 )
             },
             // We leave `floatingActionButton` empty on purpose
@@ -71,13 +70,12 @@ fun FixedBottomBar(
     onHistoryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val barShape = RoundedCornerShape(24.dp)
     Surface(
-        shape = barShape,
         tonalElevation = 3.dp,
         border = BorderStroke(1.5.dp, Color.Yellow),
-        modifier = modifier,
-        color = Color(0xFF333333)
+        modifier = modifier.background(Gray30),
+        color = Color(0xFF333333),
+        shape = RoundedCornerShape(24.dp),
     ) {
         BottomAppBar(
             containerColor = Color.Transparent,
