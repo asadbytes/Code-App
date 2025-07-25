@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Patterns
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.data.ItemType
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
+import com.asadbyte.codeapp.ui.theme.Gray10
 import java.io.File
 import java.io.FileOutputStream
 
@@ -40,7 +42,7 @@ fun DetailScreen(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-    val bitmap by remember { mutableStateOf(generatorViewModel.generateQrCode(content)) }
+    val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(content)) }
     val isUrl = remember { Patterns.WEB_URL.matcher(content).matches() }
 
     var showShareDialog by remember { mutableStateOf(false) }
@@ -68,7 +70,8 @@ fun DetailScreen(
                     }
                 }
             )
-        }
+        },
+        modifier = Modifier.background(Gray10)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -106,18 +109,18 @@ fun DetailScreen(
                 IconButton(onClick = {
                     clipboardManager.setText(AnnotatedString(content))
                 }) {
-                    Icon(painterResource(R.drawable.ic_content_copy), contentDescription = "Copy")
+                    Icon(painterResource(R.drawable.ic_detail_copy), contentDescription = "Copy")
                 }
 
                 // Share Button
                 IconButton(onClick = { showShareDialog = true /*shareContent(context, content)*/ }) {
-                    Icon(Icons.Default.Share, contentDescription = "Share")
+                    Icon(painterResource(R.drawable.ic_detail_share), contentDescription = "Share")
                 }
 
                 // Open in Browser Button (only if it's a URL)
                 if (isUrl) {
                     IconButton(onClick = { openUrl(context, content) }) {
-                        Icon(painterResource(R.drawable.ic_open_in_browser), contentDescription = "Open in Browser")
+                        Icon(painterResource(R.drawable.ic_detail_save), contentDescription = "Open in Browser")
                     }
                 }
             }
@@ -154,7 +157,7 @@ fun ShareOptionDialog(
 }
 
 // Shares the content as plain text
-private fun shareText(context: Context, content: String) {
+fun shareText(context: Context, content: String) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, content)
@@ -165,7 +168,7 @@ private fun shareText(context: Context, content: String) {
 }
 
 // Shares the bitmap as an image
-private fun shareImage(context: Context, bitmap: Bitmap) {
+fun shareImage(context: Context, bitmap: Bitmap) {
     // 1. Save bitmap to a file in the cache directory
     val cachePath = File(context.cacheDir, "images")
     cachePath.mkdirs() // Create the directory if it doesn't exist

@@ -40,4 +40,15 @@ class GeneratorViewModel @Inject constructor(
             null
         }
     }
+
+    fun getQrCode(content: String): Bitmap? {
+        return try {
+            val barcodeEncoder = BarcodeEncoder()
+            // Generate the bitmap from the content string
+            barcodeEncoder.encodeBitmap(content, BarcodeFormat.QR_CODE, 400, 400)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 }

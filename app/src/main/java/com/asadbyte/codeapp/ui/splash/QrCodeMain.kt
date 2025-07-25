@@ -19,6 +19,7 @@ import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
+import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
 fun QrCodeMain(
@@ -82,7 +83,7 @@ fun FixedBottomBar(
             .background(Gray30)
             .border(
                 width = 1.5.dp,
-                color = Color.Yellow,
+                color = MyYellow,
                 shape = RoundedCornerShape(24.dp)
             )
             .height(102.dp)

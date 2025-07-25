@@ -14,6 +14,9 @@ interface HistoryDao {
     @Query("SELECT * FROM history_table WHERE isFavorite = 1 ORDER BY timestamp DESC")
     fun getFavorites(): Flow<List<HistoryItem>>
 
+    @Query("SELECT * FROM history_table WHERE id = :id")
+    suspend fun getItemById(id: String): HistoryItem?
+
     @Update
     suspend fun updateItem(item: HistoryItem)
 

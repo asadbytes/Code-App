@@ -1,11 +1,14 @@
 package com.asadbyte.codeapp.ui.history
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asadbyte.codeapp.data.HistoryItem
 import com.asadbyte.codeapp.data.HistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,4 +36,14 @@ class HistoryViewModel @Inject constructor(
         repository.deleteItems(items)
     }
 
+    fun getItembyId(id: Int): HistoryItem? {
+        Log.d("HistoryViewModel", "getting item with id: $id")
+        val item = history.value.find { it.id == id }
+        Log.d("HistoryViewModel", "returning this item: $item")
+        Log.d("HistoryViewModel", "history size: ${history.value.size}")
+        for(i in history.value){
+            Log.d("HistoryViewModel", "item${i.id}: ${i.content}")
+        }
+        return item
+    }
 }
