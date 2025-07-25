@@ -149,6 +149,7 @@ fun HistoryHomeNew(
         // Top Bar - Fixed icon visibility logic
         Row(
             modifier = Modifier
+                .height(120.dp)
                 .fillMaxWidth()
                 .padding(start = 30.dp, top = 20.dp, end = 30.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -162,25 +163,30 @@ fun HistoryHomeNew(
             Spacer(modifier = Modifier.weight(1f))
 
             // Fix: Show delete icon only in selection mode, settings icon otherwise
-            if (isSelectionMode) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_delete),
-                    contentDescription = "Delete Selected",
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clickable {
-                            viewModel.deleteItems(selectedItems.toList())
-                            selectedItems.clear()
-                        }
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_generate_settings),
-                    contentDescription = "Settings",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clickable { onSettingsClick() }
-                )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(120.dp)
+            ) {
+                if (isSelectionMode) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_history_delete),
+                        contentDescription = "Delete Selected",
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clickable {
+                                viewModel.deleteItems(selectedItems.toList())
+                                selectedItems.clear()
+                            }
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_generate_settings),
+                        contentDescription = "Settings",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clickable { onSettingsClick() }
+                    )
+                }
             }
         }
 
@@ -198,7 +204,9 @@ fun HistoryHomeNew(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 102.dp + 10.dp)
+            ,
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(horizontal = 18.dp)
         ) {
@@ -230,8 +238,7 @@ fun HistoryHomeNew(
                                 if (!isSelectionMode) { // Only allow favorite toggle when not in selection mode
                                     viewModel.toggleFavorite(item)
                                 }
-                            },
-                            onDeleteItem = { viewModel.deleteItem(item) }
+                            }
                         )
                     }
                 }
@@ -262,8 +269,7 @@ fun HistoryHomeNew(
                                 if (!isSelectionMode) { // Only allow favorite toggle when not in selection mode
                                     viewModel.toggleFavorite(item)
                                 }
-                            },
-                            onDeleteItem = { viewModel.deleteItem(item) }
+                            }
                         )
                     }
                 }
@@ -280,8 +286,7 @@ fun HistoryItemComposable(
     onItemClick: (HistoryItem) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onToggleFavorite: () -> Unit,
-    onDeleteItem: () -> Job
+    onToggleFavorite: () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -298,6 +303,7 @@ fun HistoryItemComposable(
                     Gray30
                 }
             )
+            .height(100.dp)
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -309,7 +315,7 @@ fun HistoryItemComposable(
                 imageVector = Icons.Filled.CheckCircle,
                 contentDescription = "Selected",
                 tint = MyYellow,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(45.dp)
             )
         } else {
             Image(
@@ -331,18 +337,14 @@ fun HistoryItemComposable(
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
-
-                // Show favorite icon only when not in selection mode or if this item is not selected
-                if (!isSelected) {
-                    Icon(
-                        imageVector = if (item.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Toggle Favorite",
-                        tint = if (item.isFavorite) MyYellow else Color.White,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable { onToggleFavorite() }
-                    )
-                }
+                Icon(
+                    imageVector = if (item.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Toggle Favorite",
+                    tint = if (item.isFavorite) MyYellow else Color.White,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onToggleFavorite() }
+                )
             }
             Row {
                 Text(
