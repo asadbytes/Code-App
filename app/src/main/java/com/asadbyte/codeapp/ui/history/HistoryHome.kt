@@ -9,18 +9,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,18 +46,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.data.HistoryItem
-import com.asadbyte.codeapp.ui.generator.generateHomeList
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.ItimFont
+import com.asadbyte.codeapp.ui.theme.MyYellow
+import kotlinx.coroutines.Job
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 // Add this enum class to your project, for example, in the same file or a dedicated model file.
 enum class HistoryMode {
-    Generated, Scanned
+    All, Favorite
 }
 
 @Composable
@@ -63,9 +67,6 @@ fun HistoryModeToggle(
     selectedMode: HistoryMode,
     onModeChange: (HistoryMode) -> Unit
 ) {
-    // Define the color for the selected state
-    val yellowColor = Color(0xFFFFD600)
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -82,14 +83,14 @@ fun HistoryModeToggle(
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(24.dp))
                 // Apply yellow background if this mode is selected
-                .background(if (selectedMode == HistoryMode.Generated) yellowColor else Color.Transparent)
-                .clickable { onModeChange(HistoryMode.Generated) },
+                .background(if (selectedMode == HistoryMode.All) MyYellow else Color.Transparent)
+                .clickable { onModeChange(HistoryMode.All) },
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Generated",
+                text = "All",
                 // Change text color for better contrast
-                color = if (selectedMode == HistoryMode.Generated) Color.Black else Color.White,
+                color = if (selectedMode == HistoryMode.All) Color.Black else Color.White,
                 fontFamily = ItimFont, // Your custom font
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
@@ -103,14 +104,14 @@ fun HistoryModeToggle(
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(24.dp))
                 // Apply yellow background if this mode is selected
-                .background(if (selectedMode == HistoryMode.Scanned) yellowColor else Color.Transparent)
-                .clickable { onModeChange(HistoryMode.Scanned) },
+                .background(if (selectedMode == HistoryMode.Favorite) MyYellow else Color.Transparent)
+                .clickable { onModeChange(HistoryMode.Favorite) },
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Scanned",
+                text = "Favorite",
                 // Change text color for better contrast
-                color = if (selectedMode == HistoryMode.Scanned) Color.Black else Color.White,
+                color = if (selectedMode == HistoryMode.Favorite) Color.Black else Color.White,
                 fontFamily = ItimFont, // Your custom font
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
@@ -122,11 +123,12 @@ fun HistoryModeToggle(
 @Composable
 fun HistoryHomeNew(
     onSettingsClick: () -> Unit,
+    onItemClick: (HistoryItem) -> Unit,
     navController: NavController,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     // 1. Add state to remember the selected mode
-    var selectedMode by remember { mutableStateOf(HistoryMode.Generated) }
+    var selectedMode by remember { mutableStateOf(HistoryMode.All) }
     val historyItems by viewModel.history.collectAsState()
     val favoriteItems by viewModel.favorites.collectAsState()
 
@@ -179,16 +181,26 @@ fun HistoryHomeNew(
             contentPadding = PaddingValues(horizontal = 18.dp)
         ) {
             when (selectedMode) {
-                HistoryMode.Generated -> {
+                HistoryMode.All -> {
                     items(historyItems) {
-                        HistoryItemComposable(it)
+                        HistoryItemComposable(
+                            item = it,
+                            onItemClick = onItemClick,
+                            onToggleFavorite = { viewModel.toggleFavorite(it) },
+                            onDeleteItem = { viewModel.deleteItem(it) }
+                        )
                     }
                 }
-                HistoryMode.Scanned -> {
+                HistoryMode.Favorite -> {
                     // Your UI for "Scanned" history items
                     // For example, you can show different items or an empty state
                     items(favoriteItems) {
-                        HistoryItemComposable(it) // Using the same for demonstration
+                        HistoryItemComposable(
+                            item = it,
+                            onItemClick = onItemClick,
+                            onToggleFavorite = { viewModel.toggleFavorite(it) },
+                            onDeleteItem = { viewModel.deleteItem(it) }
+                        )
                     }
                 }
             }
@@ -199,10 +211,14 @@ fun HistoryHomeNew(
 @Composable
 fun HistoryItemComposable(
     item: HistoryItem,
-    modifier: Modifier = Modifier
+    onItemClick: (HistoryItem) -> Unit,
+    modifier: Modifier = Modifier,
+    onToggleFavorite: () -> Job,
+    onDeleteItem: () -> Job
 ) {
     Row(
         modifier = modifier
+            .clickable { onItemClick(item) }
             .clip(RoundedCornerShape(24.dp))
             .background(Gray30)
             .fillMaxWidth()
@@ -218,17 +234,33 @@ fun HistoryItemComposable(
         Column {
             Row {
                 Text(
-                    text = item.content,
+                    text = item.content.take(10) + if (item.content.length > 10) "..." else "",
                     color = Color.White,
                     fontFamily = ItimFont,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 120.dp)
                 )
+
                 Spacer(modifier = Modifier.weight(1f))
+
+                Icon(
+                    imageVector = if (item.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Toggle Favorite",
+                    tint = if (item.isFavorite) MyYellow else Color.White,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onToggleFavorite() }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_history_delete),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    contentDescription = "Delete Item",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onDeleteItem() }
                 )
             }
             Row {
@@ -254,7 +286,8 @@ private fun HistoryItemPreview() {
     CodeAppTheme {
         HistoryHomeNew(
             onSettingsClick = {},
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
+            onItemClick = {}
         )
     }
 }

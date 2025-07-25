@@ -161,6 +161,11 @@ fun AppNavigation() {
                 )*/
                 HistoryHomeNew(
                     onSettingsClick = { /* Handle settings click */ },
+                    onItemClick = { item ->
+                        // URL-encode the content to handle special characters safely
+                        val encodedContent = URLEncoder.encode(item.content, "UTF-8")
+                        navController.navigate("detail/$encodedContent")
+                    },
                     navController = navController
                 )
             }
