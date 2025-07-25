@@ -1,8 +1,10 @@
 package com.asadbyte.codeapp.ui.history
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,12 +17,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
@@ -28,7 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -129,6 +133,9 @@ fun HistoryHomeNew(
 ) {
     // 1. Add state to remember the selected mode
     var selectedMode by remember { mutableStateOf(HistoryMode.All) }
+    val selectedItems = remember { mutableStateListOf<HistoryItem>() }
+    // Fix: Update isSelectionMode to be derived state that recomposes properly
+    val isSelectionMode by remember { derivedStateOf { selectedItems.isNotEmpty() } }
     val historyItems by viewModel.history.collectAsState()
     val favoriteItems by viewModel.favorites.collectAsState()
 
@@ -136,14 +143,14 @@ fun HistoryHomeNew(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray10),
-        horizontalAlignment = Alignment.CenterHorizontally // Center children like the toggle
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Top Bar (No changes)
+        // Top Bar - Fixed icon visibility logic
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 30.dp),
+                .padding(start = 30.dp, top = 20.dp, end = 30.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -153,13 +160,28 @@ fun HistoryHomeNew(
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.ic_generate_settings),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clickable { onSettingsClick() }
-            )
+
+            // Fix: Show delete icon only in selection mode, settings icon otherwise
+            if (isSelectionMode) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_history_delete),
+                    contentDescription = "Delete Selected",
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clickable {
+                            viewModel.deleteItems(selectedItems.toList())
+                            selectedItems.clear()
+                        }
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_generate_settings),
+                    contentDescription = "Settings",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clickable { onSettingsClick() }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -182,24 +204,66 @@ fun HistoryHomeNew(
         ) {
             when (selectedMode) {
                 HistoryMode.All -> {
-                    items(historyItems) {
+                    items(historyItems) { item ->
+                        val isSelected = selectedItems.contains(item)
                         HistoryItemComposable(
-                            item = it,
-                            onItemClick = onItemClick,
-                            onToggleFavorite = { viewModel.toggleFavorite(it) },
-                            onDeleteItem = { viewModel.deleteItem(it) }
+                            item = item,
+                            isSelected = isSelected, // Pass selection state
+                            onItemClick = {
+                                if (isSelectionMode) {
+                                    // Toggle selection
+                                    if (isSelected) {
+                                        selectedItems.remove(item)
+                                    } else {
+                                        selectedItems.add(item)
+                                    }
+                                } else {
+                                    onItemClick(item)
+                                }
+                            },
+                            onLongClick = {
+                                if (!isSelected) {
+                                    selectedItems.add(item)
+                                }
+                            },
+                            onToggleFavorite = {
+                                if (!isSelectionMode) { // Only allow favorite toggle when not in selection mode
+                                    viewModel.toggleFavorite(item)
+                                }
+                            },
+                            onDeleteItem = { viewModel.deleteItem(item) }
                         )
                     }
                 }
                 HistoryMode.Favorite -> {
-                    // Your UI for "Scanned" history items
-                    // For example, you can show different items or an empty state
-                    items(favoriteItems) {
+                    items(favoriteItems) { item ->
+                        val isSelected = selectedItems.contains(item)
                         HistoryItemComposable(
-                            item = it,
-                            onItemClick = onItemClick,
-                            onToggleFavorite = { viewModel.toggleFavorite(it) },
-                            onDeleteItem = { viewModel.deleteItem(it) }
+                            item = item,
+                            isSelected = isSelected, // Pass selection state
+                            onItemClick = {
+                                if (isSelectionMode) {
+                                    // Toggle selection
+                                    if (isSelected) {
+                                        selectedItems.remove(item)
+                                    } else {
+                                        selectedItems.add(item)
+                                    }
+                                } else {
+                                    onItemClick(item)
+                                }
+                            },
+                            onLongClick = {
+                                if (!isSelected) {
+                                    selectedItems.add(item)
+                                }
+                            },
+                            onToggleFavorite = {
+                                if (!isSelectionMode) { // Only allow favorite toggle when not in selection mode
+                                    viewModel.toggleFavorite(item)
+                                }
+                            },
+                            onDeleteItem = { viewModel.deleteItem(item) }
                         )
                     }
                 }
@@ -208,29 +272,53 @@ fun HistoryHomeNew(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HistoryItemComposable(
     item: HistoryItem,
+    isSelected: Boolean, // Add selection state parameter
     onItemClick: (HistoryItem) -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onToggleFavorite: () -> Job,
+    onToggleFavorite: () -> Unit,
     onDeleteItem: () -> Job
 ) {
     Row(
         modifier = modifier
-            .clickable { onItemClick(item) }
+            .combinedClickable(
+                onClick = { onItemClick(item) },
+                onLongClick = onLongClick
+            )
             .clip(RoundedCornerShape(24.dp))
-            .background(Gray30)
+            // Fix: Change background color based on selection state
+            .background(
+                if (isSelected) {
+                    MyYellow.copy(alpha = 0.3f) // Use your app's accent color with transparency
+                } else {
+                    Gray30
+                }
+            )
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_bottom_bar_scanner),
-            contentDescription = null,
-            modifier = Modifier.size(60.dp)
-        )
+        // Add selection indicator
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Filled.CheckCircle,
+                contentDescription = "Selected",
+                tint = MyYellow,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.ic_bottom_bar_scanner),
+                contentDescription = null,
+                modifier = Modifier.size(60.dp)
+            )
+        }
+
         Column {
             Row {
                 Text(
@@ -244,24 +332,17 @@ fun HistoryItemComposable(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Icon(
-                    imageVector = if (item.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Toggle Favorite",
-                    tint = if (item.isFavorite) MyYellow else Color.White,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable { onToggleFavorite() }
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.ic_history_delete),
-                    contentDescription = "Delete Item",
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable { onDeleteItem() }
-                )
+                // Show favorite icon only when not in selection mode or if this item is not selected
+                if (!isSelected) {
+                    Icon(
+                        imageVector = if (item.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Toggle Favorite",
+                        tint = if (item.isFavorite) MyYellow else Color.White,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { onToggleFavorite() }
+                    )
+                }
             }
             Row {
                 Text(

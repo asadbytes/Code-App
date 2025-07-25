@@ -18,4 +18,8 @@ class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) 
     suspend fun deleteItem(item: HistoryItem) {
         historyDao.deleteItem(item)
     }
+
+    suspend fun deleteItems(items: List<HistoryItem>) {
+        historyDao.deleteItems(items)
+    }
 }

@@ -19,4 +19,7 @@ interface HistoryDao {
 
     @Delete
     suspend fun deleteItem(item: HistoryItem)
+
+    @Delete
+    suspend fun deleteItems(items: List<HistoryItem>)
 }

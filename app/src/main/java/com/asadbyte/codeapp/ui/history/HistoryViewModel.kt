@@ -28,4 +28,9 @@ class HistoryViewModel @Inject constructor(
     fun deleteItem(item: HistoryItem) = viewModelScope.launch {
         repository.deleteItem(item)
     }
+
+    fun deleteItems(items: List<HistoryItem>) = viewModelScope.launch {
+        repository.deleteItems(items)
+    }
+
 }
