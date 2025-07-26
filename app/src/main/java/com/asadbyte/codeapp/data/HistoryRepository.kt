@@ -7,8 +7,8 @@ class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) 
     fun getAllHistory() = historyDao.getAllHistory()
     fun getFavorites() = historyDao.getFavorites()
 
-    suspend fun insertItem(item: HistoryItem) {
-        historyDao.insertItem(item)
+    suspend fun insertItem(item: HistoryItem): Long {
+        return historyDao.insertItem(item)
     }
 
     suspend fun updateItem(item: HistoryItem) {

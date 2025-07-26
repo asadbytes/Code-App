@@ -1,6 +1,7 @@
 package com.asadbyte.codeapp.ui.scanner
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asadbyte.codeapp.data.HistoryItem
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 
 // Data class to hold the UI state for the scanner screen
 data class ScannerUiState(
+    val scannedId: Long? = null,
     val scannedCode: String? = null,
     val capturedBitmap: Bitmap? = null
 )
@@ -29,10 +31,18 @@ class ScannerViewModel @Inject constructor(
     // Function to be called when a QR code is successfully scanned
     fun onQrCodeScanned(code: String, bitmap: Bitmap) {
         viewModelScope.launch {
-            // Save the scanned item to the database
-            repository.insertItem(HistoryItem(content = code, type = ItemType.SCAN))
+            try {
+                val id = repository.insertItem(HistoryItem(content = code, type = ItemType.SCAN))
+                _uiState.value = ScannerUiState(
+                    scannedId = id,
+                    scannedCode = code,
+                    capturedBitmap = bitmap
+                )
+            } catch (e: Exception) {
+                Log.e("Scanner", "Database Insert failed", e)
+                _uiState.value = ScannerUiState(scannedCode = code, capturedBitmap = bitmap)
+            }
         }
-        _uiState.value = ScannerUiState(scannedCode = code, capturedBitmap = bitmap)
     }
 
     // Function to reset the state, e.g., after navigating away

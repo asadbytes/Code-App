@@ -1,6 +1,5 @@
-package com.asadbyte.codeapp.ui.splash
+package com.asadbyte.codeapp.ui.others
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
-import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.MyYellow
 

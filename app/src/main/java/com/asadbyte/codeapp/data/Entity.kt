@@ -10,7 +10,7 @@ enum class ItemType {
 @Entity(tableName = "history_table")
 data class HistoryItem(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0L,
     val content: String,
     val type: ItemType,
     val timestamp: Long = System.currentTimeMillis(),

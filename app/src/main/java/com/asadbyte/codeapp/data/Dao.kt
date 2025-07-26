@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: HistoryItem)
+    suspend fun insertItem(item: HistoryItem): Long
 
     @Query("SELECT * FROM history_table ORDER BY timestamp DESC")
     fun getAllHistory(): Flow<List<HistoryItem>>

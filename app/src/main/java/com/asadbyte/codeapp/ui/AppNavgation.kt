@@ -4,45 +4,29 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalMapOf
-import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
-import com.asadbyte.codeapp.data.HistoryItem
-import com.asadbyte.codeapp.data.HistoryRepository
-import com.asadbyte.codeapp.ui.detail.DetailScreen
 import com.asadbyte.codeapp.ui.detail.DetailScreenNew
 import com.asadbyte.codeapp.ui.generator.GenerateHome
 import com.asadbyte.codeapp.ui.generator.GeneratorInputScreen
 import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
 import com.asadbyte.codeapp.ui.history.HistoryHomeNew
-import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
+import com.asadbyte.codeapp.ui.others.NewResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerScreen
-import com.asadbyte.codeapp.ui.splash.MySplashScreen
-import com.asadbyte.codeapp.ui.splash.QrCodeMain
-import com.asadbyte.codeapp.ui.splash.StartScreen
-import java.net.URLDecoder
+import com.asadbyte.codeapp.ui.others.QrCodeMain
+import com.asadbyte.codeapp.ui.others.StartScreen
 import java.net.URLEncoder
 
 sealed class Screen(val route: String, val label: String, @DrawableRes val icon: Int) {
@@ -81,19 +65,21 @@ fun AppNavigation() {
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
                 ScannerScreen(
-                    onResult = { bitmap, content ->
+                    onResult = { scannerId, bitmap, content ->
+                        Log.d("Scanned Id", "AppNavigation: got this id from onResult: $scannerId")
                         val key = "scan_bitmap_${System.currentTimeMillis()}"
                         bitmapCache[key] = bitmap
                         val encodedContent = URLEncoder.encode(content, "UTF-8")
-                        navController.navigate("scan_result/$key/$encodedContent")
+                        navController.navigate("scan_result/$key/$encodedContent/$scannerId")
                     }
                 )
             }
         }
         // Scan Result Screen
-        composable("scan_result/{bitmap_key}/{content}") { backStackEntry ->
+        composable("scan_result/{bitmap_key}/{content}/{scannerId}") { backStackEntry ->
             val bitmapKey = backStackEntry.arguments?.getString("bitmap_key")
             val content = backStackEntry.arguments?.getString("content")
+            val scannerId = backStackEntry.arguments?.getString("scannerId")
             val bitmap = bitmapCache[bitmapKey]
 
             if (bitmap != null && content != null) {
@@ -102,9 +88,17 @@ fun AppNavigation() {
                    onScannerClick = { navController.navigate(Screen.Scanner.route) },
                    onHistoryClick = { navController.navigate(Screen.History.route) }
                ) {
-                   ScannerResultScreen(bitmap = bitmap, scannedContent = content) {
-                       bitmapCache.remove(bitmapKey)
-                       navController.popBackStack()
+                   if(scannerId == null) {
+                       ScannerResultScreen(bitmap = bitmap, scannedContent = content) {
+                           bitmapCache.remove(bitmapKey)
+                           navController.popBackStack()
+                       }
+                   } else {
+                       val item = historyItems.find { it.id == scannerId.toLong() }
+                       NewResultScreen(
+                           item = item,
+                           onNavigateBack = { navController.popBackStack() }
+                       )
                    }
                }
             }
@@ -186,8 +180,8 @@ fun AppNavigation() {
             val itemId = backStackEntry.arguments?.getString("itemId")
             Log.d("HistoryHome", "ItemId recieved in detail screen: $itemId")
             if (!itemId.isNullOrBlank()) {
-                val item = historyItems.find { it.id == itemId.toInt() }
-                Log.d("HistoryHome", "ItemId sent to viewmodel: ${itemId.toInt()}")
+                val item = historyItems.find { it.id == itemId.toLong() }
+                Log.d("HistoryHome", "ItemId sent to viewmodel: ${itemId.toLong()}")
                 // Get item by ID from your data source
                 QrCodeMain(
                     onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },

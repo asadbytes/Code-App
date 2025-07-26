@@ -35,15 +35,4 @@ class HistoryViewModel @Inject constructor(
     fun deleteItems(items: List<HistoryItem>) = viewModelScope.launch {
         repository.deleteItems(items)
     }
-
-    fun getItembyId(id: Int): HistoryItem? {
-        Log.d("HistoryViewModel", "getting item with id: $id")
-        val item = history.value.find { it.id == id }
-        Log.d("HistoryViewModel", "returning this item: $item")
-        Log.d("HistoryViewModel", "history size: ${history.value.size}")
-        for(i in history.value){
-            Log.d("HistoryViewModel", "item${i.id}: ${i.content}")
-        }
-        return item
-    }
 }

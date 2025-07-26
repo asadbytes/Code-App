@@ -1,34 +1,33 @@
-package com.asadbyte.codeapp.ui.detail
+package com.asadbyte.codeapp.ui.others
 
-import android.util.Log
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Patterns
-import android.widget.ImageButton
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,8 +51,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.data.HistoryItem
 import com.asadbyte.codeapp.data.ItemType
+import com.asadbyte.codeapp.ui.detail.DetailButton
+import com.asadbyte.codeapp.ui.detail.DetailCard
+import com.asadbyte.codeapp.ui.detail.ShareOptionDialog
+import com.asadbyte.codeapp.ui.detail.shareImage
+import com.asadbyte.codeapp.ui.detail.shareText
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
-import com.asadbyte.codeapp.ui.history.HistoryViewModel
 import com.asadbyte.codeapp.ui.history.formatTimestamp
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
@@ -62,19 +65,17 @@ import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun DetailScreenNew(
+fun NewResultScreen(
     item: HistoryItem?,
-    onNavigateBack: () -> Unit = {},
-    generatorViewModel: GeneratorViewModel = hiltViewModel()
+    onNavigateBack: () -> Unit = {}
 ) {
+    val generatorViewModel: GeneratorViewModel = hiltViewModel()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
     var showShareDialog by remember { mutableStateOf(false) }
-
     if(item != null) {
         val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item.content)) }
-        val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
         if (showShareDialog) {
             ShareOptionDialog(
                 onDismiss = { showShareDialog = false },
@@ -104,7 +105,7 @@ fun DetailScreenNew(
                     modifier = Modifier.clickable { onNavigateBack() }
                 )
                 Text(
-                    text = "Details",
+                    text = "Result",
                     fontFamily = ItimFont,
                     fontSize = 35.sp,
                     color = Color.White,
@@ -112,9 +113,14 @@ fun DetailScreenNew(
 
                 )
             }
-            DetailCard(
-                item = item,
-                imageBitmap = bitmap!!.asImageBitmap()
+            ResultCard(item = item)
+            Image(
+                bitmap = bitmap!!.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .border(4.dp, MyYellow)
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -136,7 +142,7 @@ fun DetailScreenNew(
                     DetailButton(
                         imageRes = R.drawable.ic_detail_save,
                         text = "Save",
-                        onClick = {  }
+                        onClick = { bitmap?.let { saveBitmapToGallery(context, it, title = "QRCode_${item.id}") } }
                     )
                 }
             }
@@ -157,36 +163,9 @@ fun DetailScreenNew(
 }
 
 @Composable
-fun DetailButton(
-    imageRes: Int,
-    text: String,
-    onClick: () -> Unit
+fun ResultCard(
+    item: HistoryItem
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = null,
-            modifier = Modifier.padding(0.dp)
-        )
-        Text(
-            text = text,
-            color = Color.White,
-            modifier = Modifier.padding(0.dp)
-        )
-    }
-}
-
-@Composable
-fun DetailCard(
-    item: HistoryItem,
-    imageBitmap: ImageBitmap
-) {
-    var showQRCode by remember { mutableStateOf(false) }
-
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
@@ -203,75 +182,49 @@ fun DetailCard(
                 .fillMaxWidth()
                 .background(Gray30)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_bottom_bar_scanner),
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp)
-                )
-                Column {
-                    Text(
-                        text = item.type.name,
-                        color = Color.White
-                    )
-                    Text(
-                        text = formatTimestamp(item.timestamp),
-                        color = Color.White
-                    )
-                }
-            }
-            HorizontalDivider(
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp)
-            )
-            Text(
-                text = item.content,
-                color = Color.White,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 30.dp, vertical = 10.dp)
-            )
-            if (showQRCode) {
-                Image(
-                    bitmap = imageBitmap,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .border(4.dp, MyYellow)
-                )
-            }
-            TextButton(
-                onClick = { showQRCode = !showQRCode },
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MyYellow,
-                    disabledContainerColor = Color.Transparent,
-                    disabledContentColor = MyYellow
-                ),
-                modifier = Modifier.padding(vertical = 10.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
                 Text(
-                    text = if(showQRCode) "Hide QR Code" else "Show QR Code",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    text = item.type.name,
+                    color = Color.White,
+                )
+                Text(
+                    text = item.content,
+                    color = Color.White,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun DetailNewPreview() {
-//    CodeAppTheme {
-//        DetailScreenNew()
-//    }
-//}
+fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCode_${System.currentTimeMillis()}") {
+    val filename = "$title.png"
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/QRCodeApp")
+        put(MediaStore.Images.Media.IS_PENDING, 1)
+    }
+
+    val contentResolver = context.contentResolver
+    val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (imageUri != null) {
+        contentResolver.openOutputStream(imageUri).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream!!)
+        }
+
+        // Mark as not pending to make it visible in Gallery apps
+        contentValues.clear()
+        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+        contentResolver.update(imageUri, contentValues, null, null)
+
+        Toast.makeText(context, "Saved to Gallery", Toast.LENGTH_SHORT).show()
+    } else {
+        Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+    }
+}
