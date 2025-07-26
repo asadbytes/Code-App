@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
+import com.asadbyte.codeapp.settings.SettingsScreen
 import com.asadbyte.codeapp.ui.detail.DetailScreenNew
 import com.asadbyte.codeapp.ui.generator.GenerateHome
 import com.asadbyte.codeapp.ui.generator.GeneratorInputScreen
@@ -35,6 +36,7 @@ sealed class Screen(val route: String, val label: String, @DrawableRes val icon:
     data object GeneratorHome : Screen("generator_home", "Generate", R.drawable.ic_create)
     data object Generator : Screen("generator", "Generate", R.drawable.ic_create)
     data object History : Screen("history", "History", R.drawable.outline_history_24)
+    data object Settings: Screen("settings", "Settings", R.drawable.ic_generate_settings)
 }
 
 val bottomNavItems = listOf(Screen.Scanner, Screen.Generator, Screen.History)
@@ -111,7 +113,7 @@ fun AppNavigation() {
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
                 GenerateHome(
-                    onSettingsClick = { /* Handle settings click */ },
+                    onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     navController = navController
                 )
             }
@@ -173,7 +175,7 @@ fun AppNavigation() {
                     }
                 )*/
                 HistoryHomeNew(
-                    onSettingsClick = { /* Handle settings click */ },
+                    onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     onItemClick = { item ->
                         navController.navigate("detail/${item.id}")
                         Log.d("HistoryHome", "onItemClick: ${item.id}")
@@ -207,6 +209,10 @@ fun AppNavigation() {
                     )
                 }
             }
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(onNavigateBack = { navController.popBackStack() })
         }
 
     }
