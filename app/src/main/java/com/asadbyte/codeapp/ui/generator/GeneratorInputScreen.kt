@@ -13,10 +13,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun GeneratorInputScreen(
-    onQrCodeGenerated: (Bitmap) -> Unit,
+    onQrCodeGenerated: (Long, Bitmap) -> Unit,
     generatorViewModel: GeneratorViewModel = hiltViewModel()
 ) {
     val text by generatorViewModel.inputText.collectAsState()
+    val uiState by generatorViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -36,14 +37,19 @@ fun GeneratorInputScreen(
             onClick = {
                 if (text.isNotBlank()) {
                     // Generate the QR code and trigger the callback
-                    generatorViewModel.generateQrCode(text)?.let { bitmap ->
-                        onQrCodeGenerated(bitmap)
-                    }
+                    generatorViewModel.generateQrCode(text)
                 }
             },
             enabled = text.isNotBlank()
         ) {
             Text("Generate QR Code")
         }
+    }
+
+    LaunchedEffect(uiState) {
+        if (uiState.capturedBitmap != null) {
+            onQrCodeGenerated(uiState.generatedId!!, uiState.capturedBitmap!!)
+        }
+
     }
 }

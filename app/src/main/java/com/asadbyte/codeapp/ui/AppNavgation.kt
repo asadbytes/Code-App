@@ -123,17 +123,19 @@ fun AppNavigation() {
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
-                GeneratorInputScreen(onQrCodeGenerated = { bitmap ->
+                GeneratorInputScreen(onQrCodeGenerated = { generateId, bitmap ->
                     val key = "gen_bitmap_${System.currentTimeMillis()}"
                     bitmapCache[key] = bitmap
-                    navController.navigate("generator_result/$key")
+                    navController.navigate("generator_result/$key/$generateId")
                 }
                 )
             }
         }
         // Generator Result Screen
-        composable("generator_result/{bitmap_key}") { backStackEntry ->
+        composable("generator_result/{bitmap_key}/{generateId}") { backStackEntry ->
             val bitmapKey = backStackEntry.arguments?.getString("bitmap_key")
+            val generateId = backStackEntry.arguments?.getString("generateId")
+            val item = historyItems.find { it.id == generateId?.toLong() }
             val bitmap = bitmapCache[bitmapKey]
 
             if (bitmap != null) {
@@ -142,9 +144,16 @@ fun AppNavigation() {
                     onScannerClick = { navController.navigate(Screen.Scanner.route) },
                     onHistoryClick = { navController.navigate(Screen.History.route) }
                 ) {
-                    GeneratorResultScreen(bitmap = bitmap) {
-                        bitmapCache.remove(bitmapKey)
-                        navController.popBackStack()
+                    if(item != null){
+                        NewResultScreen(
+                            item = item,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    } else {
+                        GeneratorResultScreen(bitmap = bitmap) {
+                            bitmapCache.remove(bitmapKey)
+                            navController.popBackStack()
+                        }
                     }
                 }
             }
