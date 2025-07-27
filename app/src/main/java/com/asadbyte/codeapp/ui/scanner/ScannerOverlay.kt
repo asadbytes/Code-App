@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.asadbyte.codeapp.ui.theme.MyYellow
 
 /**
  * A composable that draws a scanner overlay with a transparent central box,
@@ -44,7 +45,7 @@ fun ScannerOverlay(modifier: Modifier = Modifier) {
         drawRect(
             topLeft = boxRect.topLeft,
             size = boxRect.size,
-            color = Color.Gray,
+            color = MyYellow/*Color.Gray*/,
             style = Stroke(width = 2.dp.toPx())
         )
 
