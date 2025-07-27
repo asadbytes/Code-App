@@ -80,6 +80,17 @@ fun NavGraphBuilder.inputGraph(
                 )
             }
         }
+
+        composable(InputScreens.WIFI) {
+            QrCodeMain(
+                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
+                onScannerClick = { navController.navigate(Screen.Scanner.route) },
+                onHistoryClick = { navController.navigate(Screen.History.route) }
+            ) {
+                WifiInputScreen()
+            }
+        }
+
         composable(InputScreens.WHATSAPP) {
             QrCodeMain(
                 onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },

@@ -122,16 +122,18 @@ fun SimpleInputCard(
                 .drawBehind {
                     val strokeWidth = 3.dp.toPx()
                     val color = MyYellow
+                    // Top border
                     drawLine(
                         color = color,
-                        start = Offset(0f, 6f),
-                        end = Offset(size.width + 26, 6f),
+                        start = Offset(0f, strokeWidth / 2),
+                        end = Offset(size.width, strokeWidth / 2),
                         strokeWidth = strokeWidth
                     )
+                    // Bottom border - use actual size.height
                     drawLine(
                         color = color,
-                        start = Offset(0f, 878f),
-                        end = Offset(size.width + 26, 878f),
+                        start = Offset(0f, size.height - strokeWidth / 2),
+                        end = Offset(size.width, size.height - strokeWidth / 2),
                         strokeWidth = strokeWidth
                     )
                 }

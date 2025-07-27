@@ -102,7 +102,7 @@ val generateHomeList = listOf(
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_wifi,
-        path =  InputScreens.HOME
+        path =  InputScreens.WIFI
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_event,
