@@ -2,6 +2,7 @@ package com.asadbyte.codeapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.asadbyte.codeapp.QRScannerPreferences
 import com.asadbyte.codeapp.data.AppDatabase
 import com.asadbyte.codeapp.data.HistoryDao
 import dagger.Module

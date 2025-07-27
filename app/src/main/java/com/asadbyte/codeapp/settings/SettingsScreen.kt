@@ -34,6 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
@@ -42,9 +44,12 @@ import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun SettingsScreen(onNavigateBack: () -> Unit) {
-    var isVibrate by remember { mutableStateOf(false) }
-    var isBeep by remember { mutableStateOf(false) }
+fun SettingsScreen(
+    onNavigateBack: () -> Unit,
+    settingViewModel: SettingsViewModel = hiltViewModel()
+    ) {
+
+    val settingsUiState by settingViewModel.settingsUiState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -91,16 +96,16 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
                 title = "Vibrate",
                 subtitle = "Vibration when scan is done",
                 showSwitch = true,
-                switchChecked = isVibrate,
-                onCheckedChange = { isVibrate = it }
+                switchChecked = settingsUiState.vibration,
+                onCheckedChange = { settingViewModel.setVibration(it) }
             )
             SettingsCard(
                 imageRes = R.drawable.ic_settings_beep,
                 title = "Beep",
                 showSwitch = true,
-                switchChecked = isBeep,
+                switchChecked = settingsUiState.beepSound,
                 subtitle = "Beep when scan is done",
-                onCheckedChange = { isBeep = it }
+                onCheckedChange = { settingViewModel.setBeep(it) }
             )
 
             Text(
@@ -140,7 +145,6 @@ fun SettingsCard(
     switchChecked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
-    val yStrokePosition = if(showSwitch) 168f else 168f
     Card(
         elevation = CardDefaults.cardElevation(10.dp),
         modifier = Modifier
