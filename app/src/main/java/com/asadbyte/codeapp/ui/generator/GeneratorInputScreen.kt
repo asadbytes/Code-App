@@ -50,6 +50,5 @@ fun GeneratorInputScreen(
         if (uiState.capturedBitmap != null) {
             onQrCodeGenerated(uiState.generatedId!!, uiState.capturedBitmap!!)
         }
-
     }
 }

@@ -27,94 +27,107 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
+import com.asadbyte.codeapp.ui.theme.Gray80
 import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun SettingsScreen(onNavigateBack: () -> Boolean) {
+fun SettingsScreen(onNavigateBack: () -> Unit) {
     var isVibrate by remember { mutableStateOf(false) }
     var isBeep by remember { mutableStateOf(false) }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray10)
-            .padding(horizontal = 15.dp, vertical = 10.dp)
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
+        Image(
+            painter = painterResource(R.drawable.qrcode_bg),
+            contentDescription = "background image",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize().scale(scaleX = 1.5f, scaleY = 1.5f)
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .align(Alignment.Start)
-                .size(110.dp)
-        ){
-            Image(
-                painter = painterResource(R.drawable.ic_detail_back),
-                contentDescription = "Back button",
+                .fillMaxSize()
+                .background(Gray10)
+                .padding(horizontal = 15.dp, vertical = 10.dp)
+        ) {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxSize()
-                    .clickable { onNavigateBack() }
+                    .align(Alignment.Start)
+                    .size(110.dp)
+            ){
+                Image(
+                    painter = painterResource(R.drawable.ic_detail_back),
+                    contentDescription = "Back button",
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .fillMaxSize()
+                        .clickable { onNavigateBack() }
+                )
+            }
+            Text(
+                text = "Settings",
+                color = MyYellow,
+                fontFamily = ItimFont,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 10.dp, bottom = 10.dp)
+            )
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_vibrate,
+                title = "Vibrate",
+                subtitle = "Vibration when scan is done",
+                showSwitch = true,
+                switchChecked = isVibrate,
+                onCheckedChange = { isVibrate = it }
+            )
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_beep,
+                title = "Beep",
+                showSwitch = true,
+                switchChecked = isBeep,
+                subtitle = "Beep when scan is done",
+                onCheckedChange = { isBeep = it }
+            )
+
+            Text(
+                text = "Support",
+                color = MyYellow,
+                fontFamily = ItimFont,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 10.dp, bottom = 10.dp, top = 40.dp)
+            )
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_rate,
+                title = "Rate Us",
+                subtitle = "Your best reward to us"
+            )
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_privacy,
+                title = "Privacy Policy",
+                subtitle = "Read our privacy policy"
+            )
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_share,
+                title = "Share",
+                subtitle = "Share with your friends"
             )
         }
-        Text(
-            text = "Settings",
-            color = MyYellow,
-            fontFamily = ItimFont,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 10.dp, bottom = 10.dp)
-        )
-        SettingsCard(
-            imageRes = R.drawable.ic_settings_vibrate,
-            title = "Vibrate",
-            subtitle = "Vibration when scan is done",
-            showSwitch = true,
-            switchChecked = isVibrate,
-            onCheckedChange = { isVibrate = it }
-        )
-        SettingsCard(
-            imageRes = R.drawable.ic_settings_beep,
-            title = "Beep",
-            showSwitch = true,
-            switchChecked = isBeep,
-            subtitle = "Beep when scan is done",
-            onCheckedChange = { isBeep = it }
-        )
-
-        Text(
-            text = "Support",
-            color = MyYellow,
-            fontFamily = ItimFont,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 10.dp, bottom = 10.dp, top = 40.dp)
-        )
-        SettingsCard(
-            imageRes = R.drawable.ic_settings_rate,
-            title = "Rate Us",
-            subtitle = "Your best reward to us"
-        )
-        SettingsCard(
-            imageRes = R.drawable.ic_settings_privacy,
-            title = "Privacy Policy",
-            subtitle = "Read our privacy policy"
-        )
-        SettingsCard(
-            imageRes = R.drawable.ic_settings_share,
-            title = "Share",
-            subtitle = "Share with your friends"
-        )
     }
 }
 
@@ -193,9 +206,10 @@ fun SettingsCard(
     }
 }
 
-/*
 @Preview
 @Composable
 private fun SettingsPreview() {
-    SettingsScreen { navController.popBackStack() }
-}*/
+    SettingsScreen(
+        onNavigateBack = {}
+    )
+}

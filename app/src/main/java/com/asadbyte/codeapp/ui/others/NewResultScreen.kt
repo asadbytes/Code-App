@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -28,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +59,7 @@ import com.asadbyte.codeapp.ui.detail.ShareOptionDialog
 import com.asadbyte.codeapp.ui.detail.shareImage
 import com.asadbyte.codeapp.ui.detail.shareText
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
+import com.asadbyte.codeapp.ui.history.HistoryViewModel
 import com.asadbyte.codeapp.ui.history.formatTimestamp
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
@@ -66,9 +69,13 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
 fun NewResultScreen(
-    item: HistoryItem?,
-    onNavigateBack: () -> Unit = {}
+    generateId: Long?,
+    onNavigateBack: () -> Unit
 ) {
+    val historyViewModel: HistoryViewModel = hiltViewModel()
+    val historyItems by historyViewModel.history.collectAsState()
+    val item = historyItems.find { it.id == generateId?.toLong() }
+    Log.d("ItemId", "item fetched from historyItems: $item")
     val generatorViewModel: GeneratorViewModel = hiltViewModel()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.Screen
+import com.asadbyte.codeapp.ui.generator.input.InputScreens
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.ItimFont
@@ -93,51 +94,51 @@ fun GenerateHome(
 val generateHomeList = listOf(
     GenerateHomeItem(
         icon = R.drawable.ic_generate_text,
-        path =  Screen.Generator.route
+        path =  InputScreens.TEXT
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_website,
-        path =  Screen.Generator.route
+        path =  InputScreens.WEBSITE
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_wifi,
-        path =  Screen.Generator.route
+        path =  InputScreens.HOME
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_event,
-        path =  Screen.Generator.route
+        path =  InputScreens.HOME
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_contact,
-        path =  Screen.Generator.route
+        path =  InputScreens.HOME
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_business,
-        path =  Screen.Generator.route
+        path =  InputScreens.HOME
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_location,
-        path =  Screen.Generator.route
+        path =  InputScreens.HOME
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_whatsapp,
-        path =  Screen.Generator.route
+        path =  InputScreens.WHATSAPP
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_email,
-        path =  Screen.Generator.route
+        path =  InputScreens.EMAIL
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_twitter,
-        path =  Screen.Generator.route
+        path =  InputScreens.TWITTER
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_instagram,
-        path =  Screen.Generator.route
+        path =  InputScreens.INSTAGRAM
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_telephone,
-        path =  Screen.Generator.route
+        path =  InputScreens.PHONE
     ),
 )
 

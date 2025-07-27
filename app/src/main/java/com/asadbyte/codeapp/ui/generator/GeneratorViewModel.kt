@@ -68,4 +68,11 @@ class GeneratorViewModel @Inject constructor(
             null
         }
     }
+
+    fun clearGeneratedQrCode() {
+        _uiState.value = _uiState.value.copy(
+            capturedBitmap = null,
+            generatedId = null
+        )
+    }
 }
