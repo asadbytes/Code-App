@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,12 +42,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
-import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray20
 import com.asadbyte.codeapp.ui.theme.Gray30
@@ -57,44 +59,50 @@ fun WifiInputScreen(
     onQrCodeGenerated: (Long) -> Unit
 ) {
     val uiState by generatorViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray10)
+            .statusBarsPadding() // Handles spacing for the system status bar
+            .imePadding()       // Handles spacing for the keyboard
     ) {
+        // Top Bar
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_detail_back),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.ic_back_no_bg),
+                contentDescription = "Back",
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(32.dp) // Resized from 120.dp to a standard size
                     .clickable { onNavigateBack() }
             )
+            Spacer(Modifier.width(12.dp)) // Added space for balance
             Text(
                 text = "Wi-Fi",
                 color = Color.White,
                 fontFamily = ItimFont,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 10.dp)
             )
         }
-        Spacer(modifier = Modifier.size(90.dp))
+
+        Spacer(modifier = Modifier.height(80.dp))
+        // WifiInputCard now uses weight to flexibly fill the remaining space
         WifiInputCard(
             onGenerateClick = { text ->
                 if (text.isNotBlank()) {
                     generatorViewModel.generateQrCode(text)
                 }
             },
-            modifier = Modifier
-                .height(470.dp)
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.weight(1f)
         )
     }
+
+    // Your LaunchedEffect logic is untouched
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
             onQrCodeGenerated(uiState.generatedId!!)
@@ -108,137 +116,151 @@ fun WifiInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Your state logic is untouched
     var networkName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val visibilityOnIcon = painterResource(R.drawable.ic_visibility_on)
     val visibilityOffIcon = painterResource(R.drawable.ic_visibility_off)
-    Card(
-        modifier = modifier
-            .padding(horizontal = 20.dp)
+
+    // This outer Column handles scrolling for all the content inside
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Gray20)
-                .drawBehind {
-                    val strokeWidth = 3.dp.toPx()
-                    val color = MyYellow
-                    // Top border
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, strokeWidth / 2),
-                        end = Offset(size.width, strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                    // Bottom border - use actual size.height
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, size.height - strokeWidth / 2),
-                        end = Offset(size.width, size.height - strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                }
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+            // Your Box with the drawBehind border is preserved
+            Box(
+                modifier = Modifier
+                    .background(Gray20)
+                    .drawBehind {
+                        val strokeWidth = 3.dp.toPx()
+                        val color = MyYellow
+                        // Top border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, strokeWidth / 2),
+                            end = Offset(size.width, strokeWidth / 2),
+                            strokeWidth = strokeWidth
+                        )
+                        // Bottom border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, size.height - strokeWidth / 2),
+                            end = Offset(size.width, size.height - strokeWidth / 2),
+                            strokeWidth = strokeWidth
+                        )
+                    }
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_input_wifi),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .padding(top = 10.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                Text(
-                    text = "Network",
-                    color = Color.White,
-                    fontFamily = ItimFont,
-                    modifier = Modifier.padding(start = 15.dp, top = 10.dp)
-                )
-                OutlinedTextField(
-                    value = networkName,
-                    maxLines = 1,
-                    placeholder = { Text(text = "Enter network name") },
-                    onValueChange = { networkName = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Gray10,
-                        unfocusedContainerColor = Gray30,
-                        cursorColor = MyYellow,
-                        focusedPlaceholderColor = Gray10,
-                        unfocusedPlaceholderColor = Gray10,
-                        focusedIndicatorColor = MyYellow,
-                        unfocusedIndicatorColor = Gray10
-                    )
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                Text(
-                    text = "Password",
-                    color = Color.White,
-                    fontFamily = ItimFont,
-                    modifier = Modifier.padding(start = 15.dp, top = 10.dp)
-                )
-                OutlinedTextField(
-                    value = password,
-                    maxLines = 1,
-                    placeholder = { Text(text = "Enter password") },
-                    onValueChange = { password = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { passwordVisible = !passwordVisible },
-                            modifier = Modifier.size(29.dp)
-                        ) {
-                            Icon(
-                                painter = if (passwordVisible) visibilityOnIcon else visibilityOffIcon,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                                tint = MyYellow
-                            )
-                        }
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Gray10,
-                        unfocusedContainerColor = Gray30,
-                        cursorColor = MyYellow,
-                        focusedPlaceholderColor = Gray10,
-                        unfocusedPlaceholderColor = Gray10,
-                        focusedIndicatorColor = MyYellow,
-                        unfocusedIndicatorColor = Gray10
-                    )
-                )
-                Spacer(modifier = Modifier.size(40.dp))
-                Button(
-                    onClick = {
-                        val formatted = formatWifiFields(networkName, password)
-                        onGenerateClick(formatted)
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MyYellow,
-                        contentColor = Color.Black
-                    ),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                // This inner Column now just holds content and doesn't scroll itself
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Generate QR Code",
-                        modifier = Modifier.padding(vertical = 6.dp)
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_input_wifi),
+                        contentDescription = null,
+                        modifier = Modifier.size(60.dp)
                     )
+                    Spacer(modifier = Modifier.size(10.dp))
+
+                    // The alignment of these children is now controlled by the parent Column
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(
+                            text = "Network",
+                            color = Color.White,
+                            fontFamily = ItimFont,
+                            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+                        )
+                        OutlinedTextField(
+                            value = networkName,
+                            maxLines = 1,
+                            placeholder = { Text(text = "Enter network name") },
+                            onValueChange = { networkName = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Gray10,
+                                unfocusedContainerColor = Gray30,
+                                cursorColor = MyYellow,
+                                focusedPlaceholderColor = Gray10,
+                                unfocusedPlaceholderColor = Gray10,
+                                focusedIndicatorColor = MyYellow,
+                                unfocusedIndicatorColor = Gray10
+                            )
+                        )
+                        Spacer(modifier = Modifier.size(10.dp))
+                        Text(
+                            text = "Password",
+                            color = Color.White,
+                            fontFamily = ItimFont,
+                            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+                        )
+                        OutlinedTextField(
+                            value = password,
+                            maxLines = 1,
+                            placeholder = { Text(text = "Enter password") },
+                            onValueChange = { password = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { passwordVisible = !passwordVisible },
+                                    modifier = Modifier.size(29.dp)
+                                ) {
+                                    Icon(
+                                        painter = if (passwordVisible) visibilityOnIcon else visibilityOffIcon,
+                                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                        tint = MyYellow
+                                    )
+                                }
+                            },
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Gray10,
+                                unfocusedContainerColor = Gray30,
+                                cursorColor = MyYellow,
+                                focusedPlaceholderColor = Gray10,
+                                unfocusedPlaceholderColor = Gray10,
+                                focusedIndicatorColor = MyYellow,
+                                unfocusedIndicatorColor = Gray10
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.size(40.dp))
+
+                    Button(
+                        onClick = {
+                            val formatted = formatWifiFields(networkName, password)
+                            onGenerateClick(formatted)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MyYellow,
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = "Generate QR Code",
+                            modifier = Modifier.padding(vertical = 6.dp)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.size(20.dp))
             }
         }
+        // Spacer at the bottom for better padding when fully scrolled down
+        Spacer(Modifier.height(16.dp))
     }
 }
 

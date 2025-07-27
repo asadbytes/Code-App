@@ -50,6 +50,9 @@ import com.asadbyte.codeapp.ui.theme.Gray20
 import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun EventInputScreen(
@@ -58,44 +61,48 @@ fun EventInputScreen(
     onQrCodeGenerated: (Long) -> Unit
 ) {
     val uiState by generatorViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray10)
     ) {
+        // Top Bar
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_detail_back),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.ic_back_no_bg),
+                contentDescription = "Back",
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(32.dp) // Resized from 120.dp to a standard size
                     .clickable { onNavigateBack() }
             )
+            Spacer(Modifier.width(12.dp)) // Added space for balance
             Text(
                 text = "Event",
                 color = Color.White,
                 fontFamily = ItimFont,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 10.dp)
+                style = MaterialTheme.typography.titleLarge
+                // Removed specific bottom padding for robust alignment
             )
         }
-        //Spacer(modifier = Modifier.size(90.dp))
+
         EventInputCard(
             onGenerateClick = { text ->
                 if (text.isNotBlank()) {
                     generatorViewModel.generateQrCode(text)
                 }
             },
-            modifier = Modifier
-                .wrapContentSize()
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
+            // Use weight to make the card fill the remaining screen space
+            modifier = Modifier.weight(1f)
         )
     }
+
+    // Your LaunchedEffect logic is untouched
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
             onQrCodeGenerated(uiState.generatedId!!)
@@ -109,102 +116,118 @@ fun EventInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Your state logic is untouched
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
     var eventLocation by remember { mutableStateOf("") }
     var eventDescription by remember { mutableStateOf("") }
 
-    Card(
-        modifier = modifier
-            .padding(horizontal = 20.dp)
+    // This outer Column handles scrolling for all the content inside
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Card(
             modifier = Modifier
-                .background(Gray20)
-                .drawBehind {
-                    val strokeWidth = 3.dp.toPx()
-                    val color = MyYellow
-                    // Top border
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, strokeWidth / 2),
-                        end = Offset(size.width, strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                    // Bottom border - use actual size.height
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, size.height - strokeWidth / 2),
-                        end = Offset(size.width, size.height - strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                }
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_input_event),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .padding(top = 10.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-
-                OurSpecialEventTextField(
-                    title = "Event Name",
-                    placeHolder = "Enter event name",
-                    valueText = eventName,
-                    onValueChange = { eventName = it }
-                )
-                OurSpecialEventTextField(
-                    title = "Event Date and Time",
-                    placeHolder = "12 Dec 2022, 10:40 pm",
-                    valueText = eventDate,
-                    onValueChange = { eventDate = it }
-                )
-                OurSpecialEventTextField(
-                    title = "Event Location",
-                    placeHolder = "Enter Location",
-                    valueText = eventLocation,
-                    onValueChange = { eventLocation = it }
-                )
-                OurSpecialEventTextField(
-                    title = "Description",
-                    placeHolder = "Enter any details",
-                    valueText = eventDescription,
-                    onValueChange = { eventDescription = it },
-                    maxLines = 3,
-                    modifier = Modifier.height(130.dp)
-                )
-                Spacer(modifier = Modifier.size(40.dp))
-                Button(
-                    onClick = {
-                        val fields = EventFields(
-                            eventName = eventName,
-                            eventDate = eventDate,
-                            eventLocation = eventLocation,
-                            eventDescription = eventDescription
+            Box(
+                modifier = Modifier
+                    .background(Gray20)
+                    .drawBehind {
+                        val strokeWidth = 3.dp.toPx()
+                        val color = MyYellow
+                        // Top border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, strokeWidth / 2),
+                            end = Offset(size.width, strokeWidth / 2),
+                            strokeWidth = strokeWidth
                         )
-                        val formattedText = formatEventFields(fields)
-                        onGenerateClick(formattedText)
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MyYellow,
-                        contentColor = Color.Black
-                    ),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                        // Bottom border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, size.height - strokeWidth / 2),
+                            end = Offset(size.width, size.height - strokeWidth / 2),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+            ) {
+                // This inner Column no longer centers all its children
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                    // REMOVED: horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Generate QR Code",
-                        modifier = Modifier.padding(vertical = 6.dp)
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_input_event),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(60.dp)
+                            // ADDED: Specific alignment for this element
+                            .align(Alignment.CenterHorizontally)
                     )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // TextFields will now default to Start alignment
+                    OurSpecialEventTextField(
+                        title = "Event Name",
+                        placeHolder = "Enter event name",
+                        valueText = eventName,
+                        onValueChange = { eventName = it }
+                    )
+                    OurSpecialEventTextField(
+                        title = "Event Date and Time",
+                        placeHolder = "12 Dec 2022, 10:40 pm",
+                        valueText = eventDate,
+                        onValueChange = { eventDate = it }
+                    )
+                    OurSpecialEventTextField(
+                        title = "Event Location",
+                        placeHolder = "Enter Location",
+                        valueText = eventLocation,
+                        onValueChange = { eventLocation = it }
+                    )
+                    OurSpecialEventTextField(
+                        title = "Description",
+                        placeHolder = "Enter any details",
+                        valueText = eventDescription,
+                        onValueChange = { eventDescription = it },
+                        maxLines = 3,
+                        modifier = Modifier.height(130.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = {
+                            val fields = EventFields(
+                                eventName = eventName,
+                                eventDate = eventDate,
+                                eventLocation = eventLocation,
+                                eventDescription = eventDescription
+                            )
+                            val formattedText = formatEventFields(fields)
+                            onGenerateClick(formattedText)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MyYellow,
+                            contentColor = Color.Black
+                        ),
+                        // Alignment on the Button is preserved
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = "Generate QR Code",
+                            modifier = Modifier.padding(vertical = 6.dp)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.size(20.dp))
             }
         }
+        // Spacer at the bottom for better padding when fully scrolled down
+        Spacer(Modifier.height(16.dp))
     }
 }
 

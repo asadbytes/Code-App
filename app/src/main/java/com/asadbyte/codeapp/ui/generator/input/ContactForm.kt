@@ -12,14 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,14 +36,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
-import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray20
 import com.asadbyte.codeapp.ui.theme.Gray30
@@ -58,42 +53,49 @@ fun ContactInputScreen(
     onQrCodeGenerated: (Long) -> Unit
 ) {
     val uiState by generatorViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray10)
     ) {
+        // Top Bar
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_detail_back),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.ic_back_no_bg),
+                contentDescription = "Back",
                 modifier = Modifier
-                    .size(90.dp)
+                    .size(32.dp) // Reduced to a standard, non-distorting size
                     .clickable { onNavigateBack() }
             )
+            Spacer(Modifier.width(12.dp)) // Added space between icon and title
             Text(
                 text = "Contact",
                 color = Color.White,
                 fontFamily = ItimFont,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 10.dp)
+                style = MaterialTheme.typography.titleLarge
+                // Removed the fragile bottom padding for alignment
             )
         }
+
+        // Input Card
         ContactInputCard(
             onGenerateClick = { text ->
                 if (text.isNotBlank()) {
                     generatorViewModel.generateQrCode(text)
                 }
             },
-            modifier = Modifier
-                .wrapContentSize()
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
+            // Use weight to make the card fill the remaining space correctly
+            modifier = Modifier.weight(1f)
         )
     }
+
+    // This logic remains untouched
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
             onQrCodeGenerated(uiState.generatedId!!)
@@ -102,11 +104,13 @@ fun ContactInputScreen(
     }
 }
 
+
 @Composable
 fun ContactInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // State logic is untouched
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var companyName by remember { mutableStateOf("") }
@@ -116,158 +120,177 @@ fun ContactInputCard(
     var address by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("") }
-    Card(
-        modifier = modifier
-            .padding(horizontal = 10.dp)
+
+    // Apply the scroll modifier to an outer Column that wraps the Card.
+    // The modifier from the parent (containing weight) is applied here.
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Card(
+            // This Card now simply fills the width within the scrollable column.
             modifier = Modifier
-                .background(Gray20)
-                .drawBehind {
-                    val strokeWidth = 3.dp.toPx()
-                    val color = MyYellow
-                    // Top border
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, strokeWidth / 2),
-                        end = Offset(size.width, strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                    // Bottom border - use actual size.height
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, size.height - strokeWidth / 2),
-                        end = Offset(size.width, size.height - strokeWidth / 2),
-                        strokeWidth = strokeWidth
-                    )
-                }
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_input_contact),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .padding(top = 10.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OurSpecialContactTextField(
-                        title = "First Name",
-                        placeHolder = "Enter name",
-                        valueText = firstName,
-                        onValueChange = { firstName = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    OurSpecialContactTextField(
-                        title = "Last Name",
-                        placeHolder = "Enter Name",
-                        valueText = lastName,
-                        onValueChange = { lastName = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OurSpecialContactTextField(
-                        title = "Company",
-                        placeHolder = "Enter comp...",
-                        valueText = companyName,
-                        onValueChange = { companyName = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    OurSpecialContactTextField(
-                        title = "Job",
-                        placeHolder = "Enter job",
-                        valueText = jobName,
-                        onValueChange = { jobName = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OurSpecialContactTextField(
-                        title = "Phone",
-                        placeHolder = "Enter phone",
-                        valueText = phone,
-                        onValueChange = { phone = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    OurSpecialContactTextField(
-                        title = "Email",
-                        placeHolder = "Enter email",
-                        valueText = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                OurSpecialContactTextField(
-                    title = "Address",
-                    placeHolder = "Enter address",
-                    valueText = address,
-                    onValueChange = { address = it },
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OurSpecialContactTextField(
-                        title = "City",
-                        placeHolder = "Enter city",
-                        valueText = city,
-                        onValueChange = { city = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                    OurSpecialContactTextField(
-                        title = "Country",
-                        placeHolder = "Enter country",
-                        valueText = country,
-                        onValueChange = { country = it },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(20.dp))
-                Button(
-                    onClick = {
-                        val fields = ContactFields(
-                            firstName = firstName,
-                            lastName = lastName,
-                            companyName = companyName,
-                            jobName = jobName,
-                            phone = phone,
-                            email = email,
-                            address = address,
-                            city = city,
-                            country = country
+            Box(
+                modifier = Modifier
+                    .background(Gray20)
+                    .drawBehind {
+                        val strokeWidth = 3.dp.toPx()
+                        val color = MyYellow
+                        // Top border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, strokeWidth / 2),
+                            end = Offset(size.width, strokeWidth / 2),
+                            strokeWidth = strokeWidth
                         )
-                        val formattedText = formatContactFields(fields)
-                        onGenerateClick(formattedText)
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MyYellow,
-                        contentColor = Color.Black
-                    ),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                        // Bottom border
+                        drawLine(
+                            color = color,
+                            start = Offset(0f, size.height - strokeWidth / 2),
+                            end = Offset(size.width, size.height - strokeWidth / 2),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+            ) {
+                // This inner Column no longer needs to scroll itself.
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Generate QR Code",
-                        modifier = Modifier.padding(vertical = 6.dp)
+                    // ... all your content remains exactly the same
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_input_contact),
+                        contentDescription = null,
+                        modifier = Modifier.size(50.dp)
                     )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OurSpecialContactTextField(
+                            title = "First Name",
+                            placeHolder = "Enter name",
+                            valueText = firstName,
+                            onValueChange = { firstName = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        OurSpecialContactTextField(
+                            title = "Last Name",
+                            placeHolder = "Enter Name",
+                            valueText = lastName,
+                            onValueChange = { lastName = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OurSpecialContactTextField(
+                            title = "Company",
+                            placeHolder = "Enter comp...",
+                            valueText = companyName,
+                            onValueChange = { companyName = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        OurSpecialContactTextField(
+                            title = "Job",
+                            placeHolder = "Enter job",
+                            valueText = jobName,
+                            onValueChange = { jobName = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OurSpecialContactTextField(
+                            title = "Phone",
+                            placeHolder = "Enter phone",
+                            valueText = phone,
+                            onValueChange = { phone = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        OurSpecialContactTextField(
+                            title = "Email",
+                            placeHolder = "Enter email",
+                            valueText = email,
+                            onValueChange = { email = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OurSpecialContactTextField(
+                        title = "Address",
+                        placeHolder = "Enter address",
+                        valueText = address,
+                        onValueChange = { address = it },
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OurSpecialContactTextField(
+                            title = "City",
+                            placeHolder = "Enter city",
+                            valueText = city,
+                            onValueChange = { city = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        OurSpecialContactTextField(
+                            title = "Country",
+                            placeHolder = "Enter country",
+                            valueText = country,
+                            onValueChange = { country = it },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = {
+                            val fields = ContactFields(
+                                firstName = firstName,
+                                lastName = lastName,
+                                companyName = companyName,
+                                jobName = jobName,
+                                phone = phone,
+                                email = email,
+                                address = address,
+                                city = city,
+                                country = country
+                            )
+                            val formattedText = formatContactFields(fields)
+                            onGenerateClick(formattedText)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MyYellow,
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = "Generate QR Code",
+                            modifier = Modifier.padding(vertical = 6.dp)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.size(10.dp))
             }
         }
+        // Add a bottom spacer for better visual appearance when scrolled to the end
+        Spacer(Modifier.height(16.dp))
     }
 }
 

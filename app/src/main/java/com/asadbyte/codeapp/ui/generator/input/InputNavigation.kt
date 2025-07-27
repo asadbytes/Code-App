@@ -7,9 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.asadbyte.codeapp.data.HistoryItem
 import com.asadbyte.codeapp.ui.Screen
-import com.asadbyte.codeapp.ui.generator.GenerateHome
+import com.asadbyte.codeapp.ui.generator.GenerateMainScreen
 import com.asadbyte.codeapp.ui.others.NewResultScreen
 import com.asadbyte.codeapp.ui.others.QrCodeMain
 
@@ -44,7 +43,7 @@ fun NavGraphBuilder.inputGraph(
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
-                GenerateHome(
+                GenerateMainScreen(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     navController = navController
                 )

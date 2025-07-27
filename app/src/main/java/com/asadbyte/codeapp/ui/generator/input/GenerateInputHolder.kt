@@ -60,14 +60,13 @@ fun GenerateInputHandler(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_detail_back),
+                painter = painterResource(id = R.drawable.ic_back_no_bg),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(32.dp)
                     .clickable { onNavigateBack() }
             )
             Text(
@@ -78,7 +77,7 @@ fun GenerateInputHandler(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
         }
-        Spacer(modifier = Modifier.size(120.dp))
+        Spacer(modifier = Modifier.height(80.dp))
         SimpleInputCard(
             textValue = text,
             onValueChange = { generatorViewModel.onInputTextChanged(it) },

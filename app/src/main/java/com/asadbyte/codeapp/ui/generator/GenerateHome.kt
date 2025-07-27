@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,14 +30,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.asadbyte.codeapp.R
-import com.asadbyte.codeapp.ui.Screen
 import com.asadbyte.codeapp.ui.generator.input.InputScreens
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.ItimFont
+import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun GenerateHome(
+fun GenerateMainScreen(
     onSettingsClick: () -> Unit,
     navController: NavController,
 ) {
@@ -45,11 +47,13 @@ fun GenerateHome(
             .background(Gray10)
     ) {
 
+        Spacer(modifier = Modifier.height(5.dp))
         // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 30.dp),
+                // Use symmetrical horizontal padding for balance.
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -59,26 +63,31 @@ fun GenerateHome(
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.ic_generate_settings),
-                contentDescription = null,
+            Icon(
+                painter = painterResource(id = R.drawable.ic_settings),
+                contentDescription = "Settings",
+                tint = MyYellow,
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(24.dp)
                     .clickable { onSettingsClick() }
             )
         }
-
+        Spacer(modifier = Modifier.height(5.dp))
         // 3-column Grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
+            // KEY FIX: Use weight(1f) to fill remaining space in the Column.
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(40.dp),
-            horizontalArrangement = Arrangement.spacedBy(35.dp),
-            contentPadding = PaddingValues(horizontal = 18.dp)
+                .weight(1f)
+                .fillMaxWidth(),
+            // Consolidate all spacing into contentPadding and arrangements.
+            // Using a single value for arrangements creates a more uniform grid.
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(16.dp)
         ) {
             items(generateHomeList) { homeItem ->
+                // aspectRatio(1f) is great for ensuring items are always square.
                 Image(
                     painter = painterResource(homeItem.icon),
                     contentDescription = null,
@@ -151,7 +160,7 @@ data class GenerateHomeItem(
 @Composable
 private fun GenerateHomePreview() {
     CodeAppTheme {
-        GenerateHome(
+        GenerateMainScreen(
             onSettingsClick = {},
             navController = NavController(LocalContext.current)
         )
