@@ -106,19 +106,19 @@ val generateHomeList = listOf(
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_event,
-        path =  InputScreens.HOME
+        path =  InputScreens.EVENT
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_contact,
-        path =  InputScreens.HOME
+        path =  InputScreens.CONTACT
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_business,
-        path =  InputScreens.HOME
+        path =  InputScreens.BUSINESS
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_location,
-        path =  InputScreens.HOME
+        path =  InputScreens.LOCATION
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_whatsapp,

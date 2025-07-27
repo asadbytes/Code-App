@@ -25,6 +25,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +41,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
+import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray20
@@ -48,9 +52,12 @@ import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun ContactInputScreen(modifier: Modifier = Modifier) {
-    var networkName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun ContactInputScreen(
+    onNavigateBack: () -> Unit,
+    generatorViewModel: GeneratorViewModel = hiltViewModel(),
+    onQrCodeGenerated: (Long) -> Unit
+) {
+    val uiState by generatorViewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +72,7 @@ fun ContactInputScreen(modifier: Modifier = Modifier) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(90.dp)
-                    .clickable { }
+                    .clickable { onNavigateBack() }
             )
             Text(
                 text = "Contact",
@@ -76,31 +83,39 @@ fun ContactInputScreen(modifier: Modifier = Modifier) {
             )
         }
         ContactInputCard(
-            networkName = networkName,
-            password = password,
-            onNetworkChange = { networkName = it},
-            onPasswordChange = { password = it},
-            onGenerateClick = { },
+            onGenerateClick = { text ->
+                if (text.isNotBlank()) {
+                    generatorViewModel.generateQrCode(text)
+                }
+            },
             modifier = Modifier
                 .wrapContentSize()
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         )
     }
+    LaunchedEffect(uiState.generatedId) {
+        if (uiState.capturedBitmap != null) {
+            onQrCodeGenerated(uiState.generatedId!!)
+            generatorViewModel.clearGeneratedQrCode()
+        }
+    }
 }
 
 @Composable
 fun ContactInputCard(
-    networkName: String,
-    password: String,
-    onNetworkChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onGenerateClick: () -> Unit,
+    onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-    val visibilityOnIcon = painterResource(R.drawable.ic_visibility_on)
-    val visibilityOffIcon = painterResource(R.drawable.ic_visibility_off)
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var companyName by remember { mutableStateOf("") }
+    var jobName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
     Card(
         modifier = modifier
             .padding(horizontal = 10.dp)
@@ -145,15 +160,15 @@ fun ContactInputCard(
                     OurSpecialContactTextField(
                         title = "First Name",
                         placeHolder = "Enter name",
-                        valueText = networkName,
-                        onValueChange = { onNetworkChange(it) },
+                        valueText = firstName,
+                        onValueChange = { firstName = it },
                         modifier = Modifier.weight(1f)
                     )
                     OurSpecialContactTextField(
                         title = "Last Name",
                         placeHolder = "Enter Name",
-                        valueText = password,
-                        onValueChange = { onPasswordChange(it) },
+                        valueText = lastName,
+                        onValueChange = { lastName = it },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -164,15 +179,15 @@ fun ContactInputCard(
                     OurSpecialContactTextField(
                         title = "Company",
                         placeHolder = "Enter comp...",
-                        valueText = networkName,
-                        onValueChange = { onNetworkChange(it) },
+                        valueText = companyName,
+                        onValueChange = { companyName = it },
                         modifier = Modifier.weight(1f)
                     )
                     OurSpecialContactTextField(
                         title = "Job",
                         placeHolder = "Enter job",
-                        valueText = password,
-                        onValueChange = { onPasswordChange(it) },
+                        valueText = jobName,
+                        onValueChange = { jobName = it },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -183,15 +198,15 @@ fun ContactInputCard(
                     OurSpecialContactTextField(
                         title = "Phone",
                         placeHolder = "Enter phone",
-                        valueText = networkName,
-                        onValueChange = { onNetworkChange(it) },
+                        valueText = phone,
+                        onValueChange = { phone = it },
                         modifier = Modifier.weight(1f)
                     )
                     OurSpecialContactTextField(
                         title = "Email",
                         placeHolder = "Enter email",
-                        valueText = password,
-                        onValueChange = { onPasswordChange(it) },
+                        valueText = email,
+                        onValueChange = { email = it },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -199,8 +214,8 @@ fun ContactInputCard(
                 OurSpecialContactTextField(
                     title = "Address",
                     placeHolder = "Enter address",
-                    valueText = password,
-                    onValueChange = { onPasswordChange(it) },
+                    valueText = address,
+                    onValueChange = { address = it },
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -208,22 +223,36 @@ fun ContactInputCard(
                     OurSpecialContactTextField(
                         title = "City",
                         placeHolder = "Enter city",
-                        valueText = networkName,
-                        onValueChange = { onNetworkChange(it) },
+                        valueText = city,
+                        onValueChange = { city = it },
                         modifier = Modifier.weight(1f)
                     )
                     OurSpecialContactTextField(
                         title = "Country",
                         placeHolder = "Enter country",
-                        valueText = password,
-                        onValueChange = { onPasswordChange(it) },
+                        valueText = country,
+                        onValueChange = { country = it },
                         modifier = Modifier.weight(1f)
                     )
                 }
 
                 Spacer(modifier = Modifier.size(20.dp))
                 Button(
-                    onClick = { onGenerateClick() },
+                    onClick = {
+                        val fields = ContactFields(
+                            firstName = firstName,
+                            lastName = lastName,
+                            companyName = companyName,
+                            jobName = jobName,
+                            phone = phone,
+                            email = email,
+                            address = address,
+                            city = city,
+                            country = country
+                        )
+                        val formattedText = formatContactFields(fields)
+                        onGenerateClick(formattedText)
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MyYellow,
@@ -240,6 +269,33 @@ fun ContactInputCard(
             }
         }
     }
+}
+
+data class ContactFields(
+    val firstName: String,
+    val lastName: String,
+    val companyName: String,
+    val jobName: String,
+    val phone: String,
+    val email: String,
+    val address: String,
+    val city: String,
+    val country: String
+)
+
+fun formatContactFields(fields: ContactFields): String {
+    return listOf(
+        fields.firstName,
+        fields.lastName,
+        fields.companyName,
+        fields.jobName,
+        fields.phone,
+        fields.email,
+        fields.address,
+        fields.city,
+        fields.country
+    ).filter { it.isNotBlank() }
+        .joinToString(separator = "\n")
 }
 
 @Composable
@@ -283,6 +339,7 @@ fun OurSpecialContactTextField(
     }
 }
 
+/*
 @Preview
 @Composable
 private fun EventInputPreview() {
@@ -290,3 +347,4 @@ private fun EventInputPreview() {
         ContactInputScreen()
     }
 }
+*/

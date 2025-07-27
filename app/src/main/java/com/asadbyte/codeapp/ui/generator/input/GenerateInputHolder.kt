@@ -212,6 +212,11 @@ val inputCardData = mapOf(
         title = "Website URL",
         placeholder = "www.qrcode.com"
     ),
+    "location" to SimpleInputCardData(
+        imageRes = R.drawable.ic_input_location,
+        title = "Location",
+        placeholder = "Enter location"
+    ),
     "whatsapp" to SimpleInputCardData(
         imageRes = R.drawable.ic_input_whatsapp,
         title = "WhatsApp Link",

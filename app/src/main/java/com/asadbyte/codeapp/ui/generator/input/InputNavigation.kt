@@ -51,120 +51,112 @@ fun NavGraphBuilder.inputGraph(
             }
         }
         composable(InputScreens.TEXT) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["text"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["text"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
         composable(InputScreens.WEBSITE) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["website"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["website"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
+        }
+
+        composable(InputScreens.LOCATION) {
+            GenerateInputHandler(
+                cardData = inputCardData["location"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
 
         composable(InputScreens.WIFI) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                WifiInputScreen()
-            }
+            WifiInputScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
 
+        composable(InputScreens.BUSINESS) {
+            BusinessInputScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
+        }
+
+        composable(InputScreens.CONTACT) {
+            ContactInputScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
+        }
+
+        composable(InputScreens.EVENT) {
+            EventInputScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
+        }
         composable(InputScreens.WHATSAPP) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["whatsapp"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["whatsapp"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
         composable(InputScreens.TWITTER) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["twitter"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["twitter"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
         composable(InputScreens.EMAIL) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["email"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["email"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
         composable(InputScreens.INSTAGRAM) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["instagram"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId ->
-                        navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["instagram"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId ->
+                    navController.navigate("input_result/$generateId")
+                }
+            )
         }
         composable(InputScreens.PHONE) {
-            Log.d("input_graph", "entered phone comp")
-            QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateInputHandler(
-                    cardData = inputCardData["phone"]!!,
-                    onNavigateBack = { navController.popBackStack() },
-                    onQrCodeGenerated = { generateId -> navController.navigate("input_result/$generateId")
-                    }
-                )
-            }
+            GenerateInputHandler(
+                cardData = inputCardData["phone"]!!,
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeGenerated = { generateId -> navController.navigate("input_result/$generateId")
+                }
+            )
         }
 
         composable(
@@ -174,19 +166,13 @@ fun NavGraphBuilder.inputGraph(
             val generateId = navController.currentBackStackEntry?.arguments?.getString("generateId")
             Log.d("input_graph", "entered result comp with id: $generateId")
             if (generateId != null) {
-                QrCodeMain(
-                    onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
-                    onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                    onHistoryClick = { navController.navigate(Screen.History.route) }
-                ) {
-                    NewResultScreen(
-                        generateId = generateId.toLong(),
-                        onNavigateBack = {
-                            navController.popBackStack()
-                            Log.d("input_graph", "navigating back from result comp")
-                        }
-                    )
-                }
+                NewResultScreen(
+                    generateId = generateId.toLong(),
+                    onNavigateBack = {
+                        navController.popBackStack()
+                        Log.d("input_graph", "navigating back from result comp")
+                    }
+                )
             }
         }
     }

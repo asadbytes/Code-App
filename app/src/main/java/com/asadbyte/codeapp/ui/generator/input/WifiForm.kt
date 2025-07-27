@@ -24,6 +24,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +40,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
+import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray20
@@ -47,9 +51,12 @@ import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 
 @Composable
-fun WifiInputScreen(modifier: Modifier = Modifier) {
-    var networkName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun WifiInputScreen(
+    onNavigateBack: () -> Unit,
+    generatorViewModel: GeneratorViewModel = hiltViewModel(),
+    onQrCodeGenerated: (Long) -> Unit
+) {
+    val uiState by generatorViewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +72,7 @@ fun WifiInputScreen(modifier: Modifier = Modifier) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
-                    .clickable { }
+                    .clickable { onNavigateBack() }
             )
             Text(
                 text = "Wi-Fi",
@@ -77,28 +84,32 @@ fun WifiInputScreen(modifier: Modifier = Modifier) {
         }
         Spacer(modifier = Modifier.size(90.dp))
         WifiInputCard(
-            networkName = networkName,
-            password = password,
-            onNetworkChange = { networkName = it},
-            onPasswordChange = { password = it},
-            onGenerateClick = { },
+            onGenerateClick = { text ->
+                if (text.isNotBlank()) {
+                    generatorViewModel.generateQrCode(text)
+                }
+            },
             modifier = Modifier
                 .height(470.dp)
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         )
     }
+    LaunchedEffect(uiState.generatedId) {
+        if (uiState.capturedBitmap != null) {
+            onQrCodeGenerated(uiState.generatedId!!)
+            generatorViewModel.clearGeneratedQrCode()
+        }
+    }
 }
 
 @Composable
 fun WifiInputCard(
-    networkName: String,
-    password: String,
-    onNetworkChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onGenerateClick: () -> Unit,
+    onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var networkName by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val visibilityOnIcon = painterResource(R.drawable.ic_visibility_on)
     val visibilityOffIcon = painterResource(R.drawable.ic_visibility_off)
@@ -151,7 +162,7 @@ fun WifiInputCard(
                     value = networkName,
                     maxLines = 1,
                     placeholder = { Text(text = "Enter network name") },
-                    onValueChange = { onNetworkChange(it) },
+                    onValueChange = { networkName = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
@@ -178,7 +189,7 @@ fun WifiInputCard(
                     value = password,
                     maxLines = 1,
                     placeholder = { Text(text = "Enter password") },
-                    onValueChange = { onPasswordChange(it) },
+                    onValueChange = { password = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
@@ -209,7 +220,10 @@ fun WifiInputCard(
                 )
                 Spacer(modifier = Modifier.size(40.dp))
                 Button(
-                    onClick = { onGenerateClick() },
+                    onClick = {
+                        val formatted = formatWifiFields(networkName, password)
+                        onGenerateClick(formatted)
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MyYellow,
@@ -228,6 +242,13 @@ fun WifiInputCard(
     }
 }
 
+fun formatWifiFields(networkName: String, password: String): String {
+    return listOf(networkName, password)
+        .filter { it.isNotBlank() }
+        .joinToString(separator = "\n")
+}
+
+/*
 @Preview
 @Composable
 private fun GenerateInputPreview() {
@@ -235,3 +256,4 @@ private fun GenerateInputPreview() {
         WifiInputScreen()
     }
 }
+*/
