@@ -40,7 +40,7 @@ fun NavGraphBuilder.inputGraph(
     ) {
         composable(InputScreens.HOME) {
             QrCodeMain(
-                onGenerateClick = { navController.navigate(Screen.GeneratorHome.route) },
+                onGenerateClick = {  },
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {

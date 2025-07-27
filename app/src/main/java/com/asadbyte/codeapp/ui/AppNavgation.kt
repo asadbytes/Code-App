@@ -68,7 +68,7 @@ fun AppNavigation() {
         composable(Screen.Scanner.route) {
             QrCodeMain(
                 onGenerateClick = { navController.navigate("input_graph") },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
+                onScannerClick = {  },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
                 ScannerScreen(
@@ -111,35 +111,6 @@ fun AppNavigation() {
             }
         }
 
-        composable(Screen.GeneratorHome.route) {
-            /*QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph) },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GenerateHome(
-                    onSettingsClick = { navController.navigate(Screen.Settings.route) },
-                    navController = navController
-                )
-            }*/
-        }
-        // Generator Input Screen
-        composable(Screen.Generator.route) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph") },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
-            ) {
-                GeneratorInputScreen(
-                    onQrCodeGenerated = { generateId, bitmap ->
-                    val key = "gen_bitmap_${System.currentTimeMillis()}"
-                    bitmapCache[key] = bitmap
-                    navController.navigate("generator_result/$key/$generateId")
-                    }
-                )
-            }
-        }
-
         // Generator Result Screen
         composable("generator_result/{bitmap_key}/{generateId}") { backStackEntry ->
             val bitmapKey = backStackEntry.arguments?.getString("bitmap_key")
@@ -172,15 +143,8 @@ fun AppNavigation() {
             QrCodeMain(
                 onGenerateClick = { navController.navigate("input_graph") },
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
+                onHistoryClick = {  }
             ) {
-                /*HistoryScreen(
-                    onItemClick = { item ->
-                        // URL-encode the content to handle special characters safely
-                        val encodedContent = URLEncoder.encode(item.content, "UTF-8")
-                        navController.navigate("detail/$encodedContent")
-                    }
-                )*/
                 HistoryHomeNew(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     onItemClick = { item ->
@@ -206,10 +170,6 @@ fun AppNavigation() {
                     onScannerClick = { navController.navigate(Screen.Scanner.route) },
                     onHistoryClick = { navController.navigate(Screen.History.route) }
                 ) {
-                    /*DetailScreen(
-                        content = item?.content ?: "no content",
-                        onNavigateBack = { navController.popBackStack() }
-                    )*/
                     DetailScreenNew(
                         item = item,
                         onNavigateBack = { navController.popBackStack() }
@@ -220,19 +180,6 @@ fun AppNavigation() {
 
         composable(Screen.Settings.route) {
             SettingsScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        composable("generator_holder/{inputCardType}") { backStackEntry ->
-            /*val inputType = backStackEntry.arguments?.getString("itemId")
-            GenerateInputHandler(
-                onNavigateBack = { navController.popBackStack() },
-                cardData = inputCardData[inputType] ?: inputCardData["text"]!!,
-                onQrCodeGenerated = { generateId, bitmap ->
-                    val key = "gen_bitmap_${System.currentTimeMillis()}"
-                    bitmapCache[key] = bitmap
-                    navController.navigate("generator_result/$key/$generateId")
-                }
-            )*/
         }
 
         inputGraph(navController = navController)
