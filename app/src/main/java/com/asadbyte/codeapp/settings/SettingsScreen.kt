@@ -152,17 +152,18 @@ fun SettingsCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Gray30)
-                .padding(16.dp)
                 .drawBehind {
                     val strokeWidth = 2.dp.toPx()
                     val color = MyYellow
+                    // Bottom border - use actual size.height
                     drawLine(
                         color = color,
-                        start = Offset(0f-26f, yStrokePosition),
-                        end = Offset(size.width + 26, yStrokePosition),
+                        start = Offset(0f, size.height - strokeWidth / 2),
+                        end = Offset(size.width, size.height - strokeWidth / 2),
                         strokeWidth = strokeWidth
                     )
                 }
+                .padding(16.dp)
         ){
             Image(
                 painter = painterResource(id = imageRes),
