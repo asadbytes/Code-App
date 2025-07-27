@@ -13,8 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -26,12 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,50 +55,53 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     settingViewModel: SettingsViewModel = hiltViewModel()
-    ) {
-
+) {
     val settingsUiState by settingViewModel.settingsUiState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(R.drawable.qrcode_bg),
-            contentDescription = "background image",
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize().scale(scaleX = 1.5f, scaleY = 1.5f)
-        )
+        // Scrollable content
         Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .background(Gray10)
-                .padding(horizontal = 15.dp, vertical = 10.dp)
+                .verticalScroll(rememberScrollState()) // Added scrolling
+                .padding(horizontal = 16.dp) // Consistent horizontal padding
+                .padding(top = 8.dp, bottom = 24.dp) // Top and bottom padding
         ) {
+            // Back button with better sizing
             Box(
                 modifier = Modifier
-                    .align(Alignment.Start)
-                    .size(110.dp)
-            ){
-                Image(
-                    painter = painterResource(R.drawable.ic_detail_back),
-                    contentDescription = "Back button",
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                IconButton(
+                    onClick = onNavigateBack,
                     modifier = Modifier
                         .align(Alignment.CenterStart)
-                        .fillMaxSize()
-                        .clickable { onNavigateBack() }
-                )
+                        .size(48.dp) // Standard touch target size
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_back_no_bg),
+                        contentDescription = "Back button",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Settings title
             Text(
                 text = "Settings",
                 color = MyYellow,
                 fontFamily = ItimFont,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 10.dp, bottom = 10.dp)
+                modifier = Modifier.padding(start = 8.dp, bottom = 16.dp)
             )
+
+            // Settings cards with consistent spacing
             SettingsCard(
                 imageRes = R.drawable.ic_settings_vibrate,
                 title = "Vibrate",
@@ -99,6 +110,9 @@ fun SettingsScreen(
                 switchChecked = settingsUiState.vibration,
                 onCheckedChange = { settingViewModel.setVibration(it) }
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             SettingsCard(
                 imageRes = R.drawable.ic_settings_beep,
                 title = "Beep",
@@ -108,30 +122,42 @@ fun SettingsScreen(
                 onCheckedChange = { settingViewModel.setBeep(it) }
             )
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Support section title
             Text(
                 text = "Support",
                 color = MyYellow,
                 fontFamily = ItimFont,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 10.dp, bottom = 10.dp, top = 40.dp)
+                modifier = Modifier.padding(start = 8.dp, bottom = 16.dp)
             )
+
+            // Support cards
             SettingsCard(
                 imageRes = R.drawable.ic_settings_rate,
                 title = "Rate Us",
                 subtitle = "Your best reward to us"
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             SettingsCard(
                 imageRes = R.drawable.ic_settings_privacy,
                 title = "Privacy Policy",
                 subtitle = "Read our privacy policy"
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             SettingsCard(
                 imageRes = R.drawable.ic_settings_share,
                 title = "Share",
                 subtitle = "Share with your friends"
             )
+
+            // Extra bottom spacing for better scrolling experience
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -146,20 +172,21 @@ fun SettingsCard(
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(10.dp),
+        elevation = CardDefaults.cardElevation(8.dp), // Slightly reduced elevation
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .wrapContentHeight() // Changed from fixed height to wrap content
+            .clip(RoundedCornerShape(12.dp)) // Added rounded corners for modern look
     ) {
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .background(Gray30)
                 .drawBehind {
                     val strokeWidth = 2.dp.toPx()
                     val color = MyYellow
-                    // Bottom border - use actual size.height
+                    // Bottom border
                     drawLine(
                         color = color,
                         start = Offset(0f, size.height - strokeWidth / 2),
@@ -168,42 +195,54 @@ fun SettingsCard(
                     )
                 }
                 .padding(16.dp)
-        ){
+        ) {
+            // Icon with consistent sizing
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = null,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier
+                    .size(32.dp) // Fixed size for consistency
+                    .padding(end = 16.dp)
             )
-            Column {
+
+            // Text content with flexible width
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = title,
                     color = Color.White,
                     fontFamily = ItimFont,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
                 Text(
                     text = subtitle,
-                    color = Color.White,
+                    color = Color.White.copy(alpha = 0.8f), // Slightly transparent for hierarchy
                     fontFamily = ItimFont,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            if(showSwitch) {
+
+            // Switch with proper spacing
+            if (showSwitch) {
                 Switch(
                     checked = switchChecked,
-                    onCheckedChange = { onCheckedChange(it) },
-                    modifier = Modifier.padding(horizontal = 10.dp),
+                    onCheckedChange = onCheckedChange,
+                    modifier = Modifier.padding(start = 8.dp),
                     colors = SwitchDefaults.colors(
                         // Off state colors
                         uncheckedTrackColor = Gray30,
-                        uncheckedThumbColor = MyYellow, // Thumb color in off state (or your preferred color)
+                        uncheckedThumbColor = MyYellow,
                         uncheckedBorderColor = MyYellow,
-
                         // On state colors
                         checkedTrackColor = MyYellow,
                         checkedThumbColor = Gray30,
-                        checkedBorderColor = MyYellow// Makes border invisible in on state
+                        checkedBorderColor = MyYellow
                     )
                 )
             }
@@ -214,7 +253,106 @@ fun SettingsCard(
 @Preview
 @Composable
 private fun SettingsPreview() {
-    SettingsScreen(
-        onNavigateBack = {}
-    )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Scrollable content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Gray10)
+                .verticalScroll(rememberScrollState()) // Added scrolling
+                .padding(horizontal = 16.dp) // Consistent horizontal padding
+                .padding(top = 8.dp, bottom = 24.dp) // Top and bottom padding
+        ) {
+            // Back button with better sizing
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(48.dp) // Standard touch target size
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_back_no_bg),
+                        contentDescription = "Back button",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Settings title
+            Text(
+                text = "Settings",
+                color = MyYellow,
+                fontFamily = ItimFont,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 8.dp, bottom = 16.dp)
+            )
+
+            // Settings cards with consistent spacing
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_vibrate,
+                title = "Vibrate",
+                subtitle = "Vibration when scan is done",
+                showSwitch = true,
+                switchChecked = true,
+                onCheckedChange = {  }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_beep,
+                title = "Beep",
+                showSwitch = true,
+                switchChecked = false,
+                subtitle = "Beep when scan is done",
+                onCheckedChange = {  }
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Support section title
+            Text(
+                text = "Support",
+                color = MyYellow,
+                fontFamily = ItimFont,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 8.dp, bottom = 16.dp)
+            )
+
+            // Support cards
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_rate,
+                title = "Rate Us",
+                subtitle = "Your best reward to us"
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_privacy,
+                title = "Privacy Policy",
+                subtitle = "Read our privacy policy"
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SettingsCard(
+                imageRes = R.drawable.ic_settings_share,
+                title = "Share",
+                subtitle = "Share with your friends"
+            )
+
+            // Extra bottom spacing for better scrolling experience
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
 }

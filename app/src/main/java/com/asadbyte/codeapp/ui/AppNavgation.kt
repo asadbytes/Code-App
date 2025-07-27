@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,13 +18,9 @@ import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.settings.SettingsScreen
 import com.asadbyte.codeapp.ui.detail.DetailScreenNew
-import com.asadbyte.codeapp.ui.generator.GenerateHome
-import com.asadbyte.codeapp.ui.generator.GeneratorInputScreen
 import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
-import com.asadbyte.codeapp.ui.generator.input.GenerateInputHandler
-import com.asadbyte.codeapp.ui.generator.input.inputCardData
 import com.asadbyte.codeapp.ui.generator.input.inputGraph
-import com.asadbyte.codeapp.ui.history.HistoryHomeNew
+import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
 import com.asadbyte.codeapp.ui.others.NewResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
@@ -145,13 +140,12 @@ fun AppNavigation() {
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
                 onHistoryClick = {  }
             ) {
-                HistoryHomeNew(
+                HistoryScreen(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     onItemClick = { item ->
                         navController.navigate("detail/${item.id}")
                         Log.d("HistoryHome", "onItemClick: ${item.id}")
-                    },
-                    navController = navController
+                    }
                 )
             }
         }
