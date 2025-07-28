@@ -4,9 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.asadbyte.codeapp.ui.theme.Gray10
+import com.asadbyte.codeapp.ui.theme.MyYellow
 import java.io.File
 import java.io.FileOutputStream
 
@@ -24,17 +35,21 @@ fun ShareOptionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Share As") },
-        text = { Text("How would you like to share this item?") },
+        text = { Text("How would you like to share this item?", color = Color.White) },
         confirmButton = {
             TextButton(onClick = onShareImage) {
-                Text("QR Code (Image)")
+                Text("QR Code (Image)", color = MyYellow)
             }
         },
         dismissButton = {
             TextButton(onClick = onShareText) {
-                Text("Text")
+                Text("Text", color = MyYellow)
             }
-        }
+        },
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(BorderStroke(2.dp, MyYellow), shape = RoundedCornerShape(16.dp))
+            .background(Gray10)
     )
 }
 
