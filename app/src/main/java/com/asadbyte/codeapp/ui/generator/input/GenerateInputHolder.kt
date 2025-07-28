@@ -56,11 +56,15 @@ fun GenerateInputHandler(
     val uiState by generatorViewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Gray10)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Gray10)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back_no_bg),
@@ -73,9 +77,7 @@ fun GenerateInputHandler(
                 text = cardData.title,
                 color = Color.White,
                 fontFamily = ItimFont,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
+                style = MaterialTheme.typography.displaySmall)
         }
         Spacer(modifier = Modifier.height(80.dp))
         SimpleInputCard(
@@ -160,7 +162,9 @@ fun SimpleInputCard(
                     maxLines = 1,
                     placeholder = { Text(text = cardData.placeholder) },
                     onValueChange = { onValueChange(it) },
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -242,3 +246,47 @@ val inputCardData = mapOf(
         placeholder = "+92xxxxxxxxx"
     ),
 )
+
+@Preview
+@Composable
+private fun InputHolderPreview() {
+    CodeAppTheme {
+        Column(
+            modifier = Modifier.fillMaxSize().background(Gray10)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_back_no_bg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {  }
+                )
+                Text(
+                    text = "Text",
+                    color = Color.White,
+                    fontFamily = ItimFont,
+                    style = MaterialTheme.typography.displaySmall,
+                )
+            }
+            Spacer(modifier = Modifier.height(80.dp))
+            SimpleInputCard(
+                textValue = "text",
+                onValueChange = {  },
+                cardData = SimpleInputCardData(
+                    imageRes = R.drawable.ic_input_text,
+                    title = "Text",
+                    placeholder = "Enter text"
+                ),
+                onGenerateClick = {},
+                modifier = Modifier
+                    .height(336.5.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}

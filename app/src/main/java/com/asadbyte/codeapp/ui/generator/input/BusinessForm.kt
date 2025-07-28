@@ -82,7 +82,7 @@ fun BusinessInputScreen(
                 // Add vertical padding for top and bottom spacing.
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.ic_back_no_bg),
                 contentDescription = "Back",
                 modifier = Modifier

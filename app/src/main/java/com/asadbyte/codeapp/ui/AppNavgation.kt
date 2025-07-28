@@ -17,26 +17,23 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.settings.SettingsScreen
-import com.asadbyte.codeapp.ui.detail.DetailScreenNew
-import com.asadbyte.codeapp.ui.generator.GeneratorResultScreen
+import com.asadbyte.codeapp.ui.detail.DetailScreen
 import com.asadbyte.codeapp.ui.generator.input.inputGraph
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
-import com.asadbyte.codeapp.ui.others.NewResultScreen
-import com.asadbyte.codeapp.ui.scanner.ScannerResultScreen
-import com.asadbyte.codeapp.ui.scanner.ScannerScreen
 import com.asadbyte.codeapp.ui.others.QrCodeMain
 import com.asadbyte.codeapp.ui.others.StartScreen
-import java.net.URLEncoder
+import com.asadbyte.codeapp.ui.scanner.NewResultScreen
+import com.asadbyte.codeapp.ui.scanner.ScannerScreen
 
 sealed class Screen(val route: String, val label: String, @DrawableRes val icon: Int) {
-    data object StartScreen: Screen("start_screen", "Start", R.drawable.ic_start_screen_qrcode)
+    data object StartScreen : Screen("start_screen", "Start", R.drawable.ic_start_screen_qrcode)
     data object Scanner : Screen("scanner", "Scan", R.drawable.qr_code_scanner)
     data object GeneratorHome : Screen("generator_home", "Generate", R.drawable.ic_create)
     data object Generator : Screen("generator", "Generate", R.drawable.ic_create)
     data object History : Screen("history", "History", R.drawable.outline_history_24)
-    data object Settings: Screen("settings", "Settings", R.drawable.ic_generate_settings)
-    data object GeneratorHolder: Screen("generator_holder", "Generate", R.drawable.ic_create)
+    data object Settings : Screen("settings", "Settings", R.drawable.ic_generate_settings)
+    data object GeneratorHolder : Screen("generator_holder", "Generate", R.drawable.ic_create)
 }
 
 val bottomNavItems = listOf(Screen.Scanner, Screen.Generator, Screen.History)
@@ -63,74 +60,26 @@ fun AppNavigation() {
         composable(Screen.Scanner.route) {
             QrCodeMain(
                 onGenerateClick = { navController.navigate("input_graph") },
-                onScannerClick = {  },
+                onScannerClick = { },
                 onHistoryClick = { navController.navigate(Screen.History.route) }
             ) {
                 ScannerScreen(
-                    onResult = { scannerId, bitmap, content ->
-                        Log.d("Scanned Id", "AppNavigation: got this id from onResult: $scannerId")
-                        val key = "scan_bitmap_${System.currentTimeMillis()}"
-                        bitmapCache[key] = bitmap
-                        val encodedContent = URLEncoder.encode(content, "UTF-8")
-                        navController.navigate("scan_result/$key/$encodedContent/$scannerId")
+                    onResult = { scannerId ->
+                        navController.navigate("scan_result/$scannerId")
                     }
                 )
             }
         }
         // Scan Result Screen
-        composable("scan_result/{bitmap_key}/{content}/{scannerId}") { backStackEntry ->
-            val bitmapKey = backStackEntry.arguments?.getString("bitmap_key")
-            val content = backStackEntry.arguments?.getString("content")
+        composable("scan_result/{scannerId}") { backStackEntry ->
             val scannerId = backStackEntry.arguments?.getString("scannerId")
-            val bitmap = bitmapCache[bitmapKey]
 
-            if (bitmap != null && content != null) {
-               QrCodeMain(
-                   onGenerateClick = { navController.navigate("input_graph") },
-                   onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                   onHistoryClick = { navController.navigate(Screen.History.route) }
-               ) {
-                   if(scannerId == null) {
-                       ScannerResultScreen(bitmap = bitmap, scannedContent = content) {
-                           bitmapCache.remove(bitmapKey)
-                           navController.popBackStack()
-                       }
-                   } else {
-                       val item = historyItems.find { it.id == scannerId.toLong() }
-                       NewResultScreen(
-                           generateId = scannerId.toLong(),
-                           onNavigateBack = { navController.popBackStack() }
-                       )
-                   }
-               }
-            }
-        }
-
-        // Generator Result Screen
-        composable("generator_result/{bitmap_key}/{generateId}") { backStackEntry ->
-            val bitmapKey = backStackEntry.arguments?.getString("bitmap_key")
-            val generateId = backStackEntry.arguments?.getString("generateId")
-            val item = historyItems.find { it.id == generateId?.toLong() }
-            val bitmap = bitmapCache[bitmapKey]
-
-            if (bitmap != null) {
-                QrCodeMain(
-                    onGenerateClick = { navController.navigate("input_graph") },
-                    onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                    onHistoryClick = { navController.navigate(Screen.History.route) }
-                ) {
-                    if(item != null){
-                        NewResultScreen(
-                            generateId = generateId?.toLong(),
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    } else {
-                        GeneratorResultScreen(bitmap = bitmap) {
-                            bitmapCache.remove(bitmapKey)
-                            navController.popBackStack()
-                        }
-                    }
-                }
+            if (scannerId != null) {
+                historyItems.find { it.id == scannerId.toLong() }
+                NewResultScreen(
+                    generateId = scannerId.toLong(),
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
 
@@ -138,7 +87,7 @@ fun AppNavigation() {
             QrCodeMain(
                 onGenerateClick = { navController.navigate("input_graph") },
                 onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                onHistoryClick = {  }
+                onHistoryClick = { }
             ) {
                 HistoryScreen(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
@@ -164,7 +113,7 @@ fun AppNavigation() {
                     onScannerClick = { navController.navigate(Screen.Scanner.route) },
                     onHistoryClick = { navController.navigate(Screen.History.route) }
                 ) {
-                    DetailScreenNew(
+                    DetailScreen(
                         item = item,
                         onNavigateBack = { navController.popBackStack() }
                     )

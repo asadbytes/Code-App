@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -132,20 +133,19 @@ fun StartScreen(
         }
 
         // Arrow button with better touch target
-        Box(
+        Row(
+            horizontalArrangement = Arrangement.End,
             modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)
-                .size(80.dp) // Slightly smaller but still good touch target
-                .clip(CircleShape)
-                .clickable { onArrowClick() }
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_yellow_arrow),
                 contentDescription = "Next Screen",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp) // Inner padding for the arrow
+                    .size(80.dp)
+                    .clickable { onArrowClick() }
             )
         }
     }

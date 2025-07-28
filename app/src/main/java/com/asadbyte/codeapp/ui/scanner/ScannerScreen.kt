@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ScannerScreen(
-    onResult: (Long, Bitmap, String) -> Unit,
+    onResult: (Long) -> Unit,
     scannerViewModel: ScannerViewModel = hiltViewModel()
 ) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -109,9 +109,9 @@ fun ScannerScreen(
 
     // This existing logic now works for both camera and gallery scans
     val uiState by scannerViewModel.uiState.collectAsState()
-    LaunchedEffect(uiState.scannedCode) {
-        if (!uiState.scannedCode.isNullOrEmpty() && uiState.capturedBitmap != null) {
-            onResult(uiState.scannedId!!, uiState.capturedBitmap!!, uiState.scannedCode!!)
+    LaunchedEffect(uiState.scannedId) {
+        if (uiState.scannedId != null) {
+            onResult(uiState.scannedId!!)
             scannerViewModel.resetState()
         }
     }

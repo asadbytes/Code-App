@@ -1,195 +1,267 @@
 package com.asadbyte.codeapp.ui.detail
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
+import com.asadbyte.codeapp.data.HistoryItem
 import com.asadbyte.codeapp.data.ItemType
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
+import com.asadbyte.codeapp.ui.history.formatTimestamp
+import com.asadbyte.codeapp.ui.scanner.saveBitmapToGallery
 import com.asadbyte.codeapp.ui.theme.Gray10
-import java.io.File
-import java.io.FileOutputStream
+import com.asadbyte.codeapp.ui.theme.Gray30
+import com.asadbyte.codeapp.ui.theme.ItimFont
+import com.asadbyte.codeapp.ui.theme.MyYellow
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    content: String,
-    onNavigateBack: () -> Unit,
+    item: HistoryItem?,
+    onNavigateBack: () -> Unit = {},
     generatorViewModel: GeneratorViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-    val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(content)) }
-    val isUrl = remember { Patterns.WEB_URL.matcher(content).matches() }
 
     var showShareDialog by remember { mutableStateOf(false) }
 
-    if (showShareDialog) {
-        ShareOptionDialog(
-            onDismiss = { showShareDialog = false },
-            onShareImage = {
-                shareImage(context, bitmap!!)
-                showShareDialog = false
-            },
-            onShareText = {
-                shareText(context, content)
-                showShareDialog = false
-            }
-        )
-    }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Details") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
+    if(item != null) {
+        val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item.content)) }
+        val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
+        if (showShareDialog) {
+            ShareOptionDialog(
+                onDismiss = { showShareDialog = false },
+                onShareImage = {
+                    shareImage(context, bitmap!!)
+                    showShareDialog = false
+                },
+                onShareText = {
+                    shareText(context, item.content)
+                    showShareDialog = false
                 }
             )
-        },
-        modifier = Modifier.background(Gray10)
-    ) { padding ->
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .background(Gray10)
         ) {
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap!!.asImageBitmap(),
-                    contentDescription = "QR Code",
-                    modifier = Modifier
-                        .size(250.dp)
-                        .padding(vertical = 16.dp)
-                )
-            }
-
-            Text(
-                text = content,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    .padding(16.dp)
             ) {
-                // Copy Button
-                IconButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(content))
-                }) {
-                    Icon(painterResource(R.drawable.ic_detail_copy), contentDescription = "Copy")
-                }
-
-                // Share Button
-                IconButton(onClick = { showShareDialog = true /*shareContent(context, content)*/ }) {
-                    Icon(painterResource(R.drawable.ic_detail_share), contentDescription = "Share")
-                }
-
-                // Open in Browser Button (only if it's a URL)
-                if (isUrl) {
-                    IconButton(onClick = { openUrl(context, content) }) {
-                        Icon(painterResource(R.drawable.ic_detail_save), contentDescription = "Open in Browser")
-                    }
+                Image(
+                    painter = painterResource(id = R.drawable.ic_back_no_bg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable { onNavigateBack() }
+                )
+                Text(
+                    text = "Details",
+                    fontFamily = ItimFont,
+                    fontSize = 35.sp,
+                    color = Color.White
+                )
+            }
+            DetailCard(
+                item = item,
+                imageBitmap = bitmap!!.asImageBitmap()
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                DetailButton(
+                    imageRes = R.drawable.ic_detail_share,
+                    text = "Share",
+                    onClick = { showShareDialog = true }
+                )
+                if(item.type == ItemType.SCAN) {
+                    DetailButton(
+                        imageRes = R.drawable.ic_detail_copy,
+                        text = "Copy",
+                        onClick = { clipboardManager.setText(AnnotatedString(item.content)) }
+                    )
+                } else {
+                    DetailButton(
+                        imageRes = R.drawable.ic_detail_save,
+                        text = "Save",
+                        onClick = { bitmap?.let { saveBitmapToGallery(context, it, title = "QRCode_${item.id}") } }
+                    )
                 }
             }
         }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Got no item to display",
+                color = Color.Red,
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
     }
-}
-
-private fun openUrl(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    context.startActivity(intent)
 }
 
 @Composable
-fun ShareOptionDialog(
-    onDismiss: () -> Unit,
-    onShareImage: () -> Unit,
-    onShareText: () -> Unit
+fun DetailButton(
+    imageRes: Int,
+    text: String,
+    onClick: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Share As") },
-        text = { Text("How would you like to share this item?") },
-        confirmButton = {
-            TextButton(onClick = onShareImage) {
-                Text("QR Code (Image)")
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = null,
+            modifier = Modifier.padding(0.dp)
+        )
+        Text(
+            text = text,
+            color = Color.White,
+            modifier = Modifier.padding(0.dp)
+        )
+    }
+}
+
+@Composable
+fun DetailCard(
+    item: HistoryItem,
+    imageBitmap: ImageBitmap
+) {
+    var showQRCode by remember { mutableStateOf(false) }
+
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp, horizontal = 30.dp)
+            .shadow(
+                elevation = 30.dp,
+                spotColor = Color.Black,
+                ambientColor = Color.White
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Gray30)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_bottom_bar_scanner),
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp)
+                )
+                Column {
+                    Text(
+                        text = item.type.name,
+                        color = Color.White
+                    )
+                    Text(
+                        text = formatTimestamp(item.timestamp),
+                        color = Color.White
+                    )
+                }
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onShareText) {
-                Text("Text")
+            HorizontalDivider(
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp)
+            )
+            Text(
+                text = item.content,
+                color = Color.White,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 30.dp, vertical = 10.dp)
+            )
+            if (showQRCode) {
+                Image(
+                    bitmap = imageBitmap,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .border(4.dp, MyYellow)
+                )
+            }
+            TextButton(
+                onClick = { showQRCode = !showQRCode },
+                colors = ButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MyYellow,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = MyYellow
+                ),
+                modifier = Modifier.padding(vertical = 10.dp)
+            ) {
+                Text(
+                    text = if(showQRCode) "Hide QR Code" else "Show QR Code",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
             }
         }
-    )
-}
-
-// Shares the content as plain text
-fun shareText(context: Context, content: String) {
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, content)
-        type = "text/plain"
     }
-    val shareIntent = Intent.createChooser(sendIntent, null)
-    context.startActivity(shareIntent)
 }
 
-// Shares the bitmap as an image
-fun shareImage(context: Context, bitmap: Bitmap) {
-    // 1. Save bitmap to a file in the cache directory
-    val cachePath = File(context.cacheDir, "images")
-    cachePath.mkdirs() // Create the directory if it doesn't exist
-    val file = File(cachePath, "qr_code.png")
-    val fileOutputStream = FileOutputStream(file)
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-    fileOutputStream.close()
-
-    // 2. Get a content URI using FileProvider
-    val imageUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider", // Ensure this matches your manifest
-        file
-    )
-
-    // 3. Create the share intent
-    val shareIntent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_STREAM, imageUri)
-        type = "image/png"
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun DetailNewPreview() {
+//    CodeAppTheme {
+//        DetailScreenNew()
+//    }
+//}
