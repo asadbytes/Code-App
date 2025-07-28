@@ -67,6 +67,25 @@ To get started with Code App, you'll need to have Android Studio installed.
 
 -----
 
+### Build Instructions
+
+To build the app from source using the command line:
+
+```bash
+./gradlew assembleRelease
+
+The signed release APK will be located in:
+
+Copy
+Edit
+app/build/outputs/apk/release/
+
+-----
+
 ## Contributing
 
 Contributions are welcome\! If you have any ideas, suggestions, or bug reports, please open an issue or create a pull request.
+
+## License
+
+Code App is licensed under the [MIT License](LICENSE).

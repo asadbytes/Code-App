@@ -1,5 +1,7 @@
 package com.asadbyte.codeapp.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +40,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +53,7 @@ import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.Gray80
 import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
+import androidx.core.net.toUri
 
 @Composable
 fun SettingsScreen(
@@ -57,6 +61,9 @@ fun SettingsScreen(
     settingViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settingsUiState by settingViewModel.settingsUiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val privacyPolicyUrl = "https://www.freeprivacypolicy.com/live/1efb0d1f-0be6-4cd1-82a8-9479c6243c3b"
+    val playStoreUrl = "https://play.google.com/store/apps/details?id=com.bfs.qrcode.scanner.generator.qrcodereader"
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -137,7 +144,11 @@ fun SettingsScreen(
             SettingsCard(
                 imageRes = R.drawable.ic_settings_rate,
                 title = "Rate Us",
-                subtitle = "Your best reward to us"
+                subtitle = "Your best reward to us",
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, playStoreUrl.toUri())
+                    context.startActivity(intent)
+                }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -145,7 +156,11 @@ fun SettingsScreen(
             SettingsCard(
                 imageRes = R.drawable.ic_settings_privacy,
                 title = "Privacy Policy",
-                subtitle = "Read our privacy policy"
+                subtitle = "Read our privacy policy",
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, privacyPolicyUrl.toUri())
+                    context.startActivity(intent)
+                }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -153,7 +168,11 @@ fun SettingsScreen(
             SettingsCard(
                 imageRes = R.drawable.ic_settings_share,
                 title = "Share",
-                subtitle = "Share with your friends"
+                subtitle = "Share with your friends",
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, playStoreUrl.toUri())
+                    context.startActivity(intent)
+                }
             )
 
             // Extra bottom spacing for better scrolling experience
@@ -167,13 +186,14 @@ fun SettingsCard(
     imageRes: Int,
     title: String,
     subtitle: String,
+    modifier: Modifier = Modifier,
     showSwitch: Boolean = false,
     switchChecked: Boolean = false,
-    onCheckedChange: (Boolean) -> Unit = {}
+    onCheckedChange: (Boolean) -> Unit = {},
 ) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp), // Slightly reduced elevation
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight() // Changed from fixed height to wrap content
             .clip(RoundedCornerShape(12.dp)) // Added rounded corners for modern look
@@ -303,7 +323,7 @@ private fun SettingsPreview() {
                 subtitle = "Vibration when scan is done",
                 showSwitch = true,
                 switchChecked = true,
-                onCheckedChange = {  }
+                onCheckedChange = { }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -314,7 +334,7 @@ private fun SettingsPreview() {
                 showSwitch = true,
                 switchChecked = false,
                 subtitle = "Beep when scan is done",
-                onCheckedChange = {  }
+                onCheckedChange = { }
             )
 
             Spacer(modifier = Modifier.height(32.dp))

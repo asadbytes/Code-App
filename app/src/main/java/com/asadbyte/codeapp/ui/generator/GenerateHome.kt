@@ -130,20 +130,8 @@ val generateHomeList = listOf(
         path =  InputScreens.LOCATION
     ),
     GenerateHomeItem(
-        icon = R.drawable.ic_generate_whatsapp,
-        path =  InputScreens.WHATSAPP
-    ),
-    GenerateHomeItem(
         icon = R.drawable.ic_generate_email,
         path =  InputScreens.EMAIL
-    ),
-    GenerateHomeItem(
-        icon = R.drawable.ic_generate_twitter,
-        path =  InputScreens.TWITTER
-    ),
-    GenerateHomeItem(
-        icon = R.drawable.ic_generate_instagram,
-        path =  InputScreens.INSTAGRAM
     ),
     GenerateHomeItem(
         icon = R.drawable.ic_generate_telephone,

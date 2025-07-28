@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Code App</string>
     <string name="title_activity_splash">SplashActivity</string>
-    <string name="app_launcher_title">QrCode</string>
+    <string name="app_launcher_title">QR Code Reader</string>
 </resources>
