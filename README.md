@@ -24,18 +24,18 @@ Code App is a sleek and intuitive Android application built with the latest tech
 
 ## Screenshots
 
-\<p align="center"\>
-\<img src="screenshots/qr\_code\_start\_screen.jpg" alt="Start screen of the app" width="250"/\>
-\<img src="screenshots/qr\_code\_scanner\_screen.jpg" alt="QR code scanner screen" width="250"/\>
-\<img src="screenshots/qr\_code\_result\_screen.jpg" alt="QR code result screen" width="250"/\>
-\<img src="screenshots/qr\_code\_input\_screen.jpg" alt="QR code input screen" width="250"/\>
-\<img src="screenshots/qr\_code\_alert\_dialog.jpg" alt="QR code alert dialog" width="250"/\>
-\<img src="screenshots/qr\_code\_details\_screen.jpg" alt="QR code details screen" width="250"/\>
-\<img src="screenshots/qr\_code\_history\_screen.jpg" alt="QR code history screen" width="250"/\>
-\<img src="screenshots/qr\_code\_history\_screen\_gestures.jpg" alt="QR code history screen with gestures" width="250"/\>
-\<img src="screenshots/qr\_code\_favorites.jpg" alt="QR code favorites screen" width="250"/\>
-\<img src="screenshots/qr\_code\_settings\_screen.jpg" alt="QR code settings screen" width="250"/\>
-\</p\>
+<p align="center">
+  <img src="screenshots/qr_code_start_screen.jpg" alt="Start screen of the app" width="250"/>
+  <img src="screenshots/qr_code_scanner_screen.jpg" alt="QR code scanner screen" width="250"/>
+  <img src="screenshots/qr_code_result_screen.jpg" alt="QR code result screen" width="250"/>
+  <img src="screenshots/qr_code_input_screen.jpg" alt="QR code input screen" width="250"/>
+  <img src="screenshots/qr_code_alert_dialog.jpg" alt="QR code alert dialog" width="250"/>
+  <img src="screenshots/qr_code_details_screen.jpg" alt="QR code details screen" width="250"/>
+  <img src="screenshots/qr_code_history_screen.jpg" alt="QR code history screen" width="250"/>
+  <img src="screenshots/qr_code_history_screen_gestures.jpg" alt="QR code history screen with gestures" width="250"/>
+  <img src="screenshots/qr_code_settings_screen.jpg" alt="QR code settings screen" width="250"/>
+</p>
+
 
 -----
 
@@ -85,7 +85,10 @@ app/build/outputs/apk/release/
 ## Contributing
 
 Contributions are welcome\! If you have any ideas, suggestions, or bug reports, please open an issue or create a pull request.
+<<<<<<< HEAD
 
 ## License
 
 Code App is licensed under the [MIT License](LICENSE).
+=======
+>>>>>>> 3d869e0bc5fa6eae8e844d03849ed539b87f17d4
