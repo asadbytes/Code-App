@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.asadbyte.codeapp.data.HistoryItem
 import com.asadbyte.codeapp.data.HistoryRepository
 import com.asadbyte.codeapp.data.ItemType
-import com.asadbyte.codeapp.ui.scanner.ScannerUiState
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.asadbyte.codeapp.ui.others.enhanceQRCodeForSharing
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.MyYellow
 import java.io.File
@@ -66,12 +67,15 @@ fun shareText(context: Context, content: String) {
 
 // Shares the bitmap as an image
 fun shareImage(context: Context, bitmap: Bitmap) {
+
+    val enhancedBitmap = enhanceQRCodeForSharing(bitmap)
+
     // 1. Save bitmap to a file in the cache directory
     val cachePath = File(context.cacheDir, "images")
     cachePath.mkdirs() // Create the directory if it doesn't exist
     val file = File(cachePath, "qr_code.png")
     val fileOutputStream = FileOutputStream(file)
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+    enhancedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
     fileOutputStream.close()
 
     // 2. Get a content URI using FileProvider

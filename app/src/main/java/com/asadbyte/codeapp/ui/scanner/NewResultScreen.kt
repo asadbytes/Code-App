@@ -52,6 +52,7 @@ import com.asadbyte.codeapp.ui.detail.shareImage
 import com.asadbyte.codeapp.ui.detail.shareText
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
+import com.asadbyte.codeapp.ui.others.enhanceQRCodeForSharing
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
@@ -203,6 +204,9 @@ fun ResultCard(
 }
 
 fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCode_${System.currentTimeMillis()}") {
+
+    val enhancedBitmap = enhanceQRCodeForSharing(bitmap)
+
     val filename = "$title.png"
     val contentValues = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -216,7 +220,7 @@ fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCod
 
     if (imageUri != null) {
         contentResolver.openOutputStream(imageUri).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream!!)
+            enhancedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream!!)
         }
 
         // Mark as not pending to make it visible in Gallery apps
@@ -229,7 +233,6 @@ fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCod
         Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
     }
 }
-
 
 @Preview
 @Composable
