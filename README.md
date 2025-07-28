@@ -33,7 +33,6 @@ Code App is a sleek and intuitive Android application built with the latest tech
   <img src="screenshots/qr_code_details_screen.jpg" alt="QR code details screen" width="250"/>
   <img src="screenshots/qr_code_history_screen.jpg" alt="QR code history screen" width="250"/>
   <img src="screenshots/qr_code_history_screen_gestures.jpg" alt="QR code history screen with gestures" width="250"/>
-  <img src="screenshots/qr_code_favorites.jpg" alt="QR code favorites screen" width="250"/>
   <img src="screenshots/qr_code_settings_screen.jpg" alt="QR code settings screen" width="250"/>
 </p>
 
