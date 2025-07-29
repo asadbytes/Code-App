@@ -1,6 +1,5 @@
 package com.asadbyte.codeapp.ui.detail
 
-import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,12 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -252,13 +250,21 @@ fun DetailCard(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp) // Adjusted padding
             )
-            Text(
-                text = item.content,
-                color = Color.White,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp) // Adjusted padding
-            )
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .height(92.dp) // Sets a fixed height (~3 lines)
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+                    .verticalScroll(scrollState) // Makes the content scroll if it overflows
+            ) {
+                Text(
+                    text = item.content,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                    // maxLines and overflow are removed to allow for scrolling
+                )
+            }
             if (showQRCode) {
                 Image(
                     bitmap = imageBitmap,

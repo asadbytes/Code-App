@@ -15,12 +15,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,15 +72,16 @@ fun NewResultScreen(
 ) {
     val historyViewModel: HistoryViewModel = hiltViewModel()
     val historyItems by historyViewModel.history.collectAsState()
-    val item = historyItems.find { it.id == generateId?.toLong() }
-    Log.d("ItemId", "item fetched from historyItems: $item")
+    val item = historyItems.find { it.id == generateId }
+
     val generatorViewModel: GeneratorViewModel = hiltViewModel()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
     var showShareDialog by remember { mutableStateOf(false) }
-    if(item != null) {
-        val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item.content)) }
+
+    if (item != null) {
+        val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item!!.content)) }
         if (showShareDialog) {
             ShareOptionDialog(
                 onDismiss = { showShareDialog = false },
@@ -83,16 +90,21 @@ fun NewResultScreen(
                     showShareDialog = false
                 },
                 onShareText = {
-                    shareText(context, item.content)
+                    shareText(context, item!!.content)
                     showShareDialog = false
                 }
             )
         }
+
+        // --- IMPROVEMENT: Added vertical scroll and horizontal alignment ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Gray10)
+                .verticalScroll(rememberScrollState()), // Makes the entire screen scrollable
+            horizontalAlignment = Alignment.CenterHorizontally // Centers children like card, image, buttons
         ) {
+            // Top Bar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -101,11 +113,13 @@ fun NewResultScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_back_no_bg),
-                    contentDescription = null,
+                    contentDescription = "Back",
                     modifier = Modifier
                         .size(32.dp)
                         .clickable { onNavigateBack() }
                 )
+                // --- IMPROVEMENT: Added space between icon and title ---
+                Spacer(Modifier.width(16.dp))
                 Text(
                     text = "Result",
                     fontFamily = ItimFont,
@@ -113,54 +127,69 @@ fun NewResultScreen(
                     color = Color.White,
                 )
             }
-            ResultCard(item = item)
+
+            ResultCard(item = item!!)
+
+            // --- IMPROVEMENT: Added space above the QR code ---
+            Spacer(Modifier.height(24.dp))
+
             Image(
                 bitmap = bitmap!!.asImageBitmap(),
-                contentDescription = null,
+                contentDescription = "Generated QR Code",
                 modifier = Modifier
                     .size(200.dp)
-                    .align(Alignment.CenterHorizontally)
                     .border(4.dp, MyYellow)
             )
+
+            // --- IMPROVEMENT: Added space above the action buttons ---
+            Spacer(Modifier.height(24.dp))
+
+            // Action Buttons
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+                // --- IMPROVEMENT: Used SpaceEvenly for better button distribution ---
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
                 DetailButton(
                     imageRes = R.drawable.ic_detail_share,
                     text = "Share",
                     onClick = { showShareDialog = true }
                 )
-                if(item.type == ItemType.SCAN) {
+                if (item!!.type == ItemType.SCAN) {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_copy,
                         text = "Copy",
-                        onClick = { clipboardManager.setText(AnnotatedString(item.content)) }
+                        onClick = { clipboardManager.setText(AnnotatedString(item!!.content)) }
                     )
                 } else {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_save,
                         text = "Save",
-                        onClick = { bitmap?.let { saveBitmapToGallery(context, it, title = "QRCode_${item.id}") } }
+                        onClick = {
+                            bitmap?.let {
+                                saveBitmapToGallery(context, it, title = "QRCode_${item!!.id}")
+                            }
+                        }
                     )
                 }
             }
         }
     } else {
+        // Fallback case for when item is not found
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Got no item to display",
-                color = Color.Red,
-                style = MaterialTheme.typography.titleLarge
-            )
+            // Using a CircularProgressIndicator while the item is loading (initial state is null)
+            CircularProgressIndicator()
         }
     }
 }
+
 
 @Composable
 fun ResultCard(
@@ -170,7 +199,8 @@ fun ResultCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 30.dp)
+            // --- IMPROVEMENT: Adjusted padding for better consistency ---
+            .padding(vertical = 16.dp, horizontal = 24.dp)
             .shadow(
                 elevation = 30.dp,
                 spotColor = Color.Black,
@@ -181,25 +211,54 @@ fun ResultCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Gray30)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            Text(
+                text = item.type.name,
+                color = Color.White,
+            )
+
+            // --- IMPROVEMENT: Made the text area scrollable as requested ---
+            val scrollState = rememberScrollState()
             Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier
+                    .height(72.dp) // Sets a fixed height (~3 lines)
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .verticalScroll(scrollState) // Makes the content scroll if it overflows
             ) {
-                Text(
-                    text = item.type.name,
-                    color = Color.White,
-                )
                 Text(
                     text = item.content,
                     color = Color.White,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+                    // maxLines and overflow are removed to allow for scrolling
                 )
             }
         }
+    }
+}
+
+// Re-using the improved DetailButton from the previous screen
+@Composable
+fun DetailButton(
+    imageRes: Int,
+    text: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp), // Increased space
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(16.dp) // Added padding for a better touch area
+    ) {
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = text // Using text as content description for accessibility
+        )
+        Text(
+            text = text,
+            color = Color.White,
+        )
     }
 }
 
