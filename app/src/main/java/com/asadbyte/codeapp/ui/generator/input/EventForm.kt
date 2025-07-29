@@ -237,8 +237,8 @@ fun OurSpecialEventTextField(
     placeHolder: String,
     valueText: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     maxLines: Int = 1,
-    modifier: Modifier = Modifier
 ) {
     Text(
         text = title,
@@ -257,7 +257,8 @@ fun OurSpecialEventTextField(
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.White,
-            unfocusedTextColor = Gray10,
+            unfocusedTextColor = Color.White,
+            focusedContainerColor = Gray30,
             unfocusedContainerColor = Gray30,
             cursorColor = MyYellow,
             focusedPlaceholderColor = Gray10,

@@ -63,7 +63,7 @@ fun SettingsScreen(
     val settingsUiState by settingViewModel.settingsUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val privacyPolicyUrl = "https://www.freeprivacypolicy.com/live/1efb0d1f-0be6-4cd1-82a8-9479c6243c3b"
-    val playStoreUrl = "https://play.google.com/store/apps/details?id=com.bfs.qrcode.scanner.generator.qrcodereader"
+    val playStoreUrl = "https://play.google.com/store/apps/details?id=com.asadbyte.codeapp"
 
     Box(
         modifier = Modifier.fillMaxSize()

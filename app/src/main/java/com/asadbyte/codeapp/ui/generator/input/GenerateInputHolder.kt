@@ -151,32 +151,14 @@ fun SimpleInputCard(
                         .align(Alignment.CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.size(10.dp))
-                Text(
-                    text = cardData.title,
-                    color = Color.White,
-                    fontFamily = ItimFont,
-                    modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+
+                OurSpecialEventTextField(
+                    title = cardData.title,
+                    placeHolder = cardData.placeholder,
+                    valueText = textValue,
+                    onValueChange = { onValueChange(it) }
                 )
-                OutlinedTextField(
-                    value = textValue,
-                    maxLines = 1,
-                    placeholder = { Text(text = cardData.placeholder) },
-                    onValueChange = { onValueChange(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Gray10,
-                        unfocusedContainerColor = Gray30,
-                        cursorColor = MyYellow,
-                        focusedPlaceholderColor = Gray10,
-                        unfocusedPlaceholderColor = Gray10,
-                        focusedIndicatorColor = MyYellow,
-                        unfocusedIndicatorColor = Gray10
-                    )
-                )
+
                 Spacer(modifier = Modifier.size(40.dp))
                 Button(
                     onClick = { onGenerateClick() },

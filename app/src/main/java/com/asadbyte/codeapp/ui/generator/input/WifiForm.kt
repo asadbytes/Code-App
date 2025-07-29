@@ -42,10 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
+import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray20
 import com.asadbyte.codeapp.ui.theme.Gray30
@@ -169,33 +171,13 @@ fun WifiInputCard(
 
                     // The alignment of these children is now controlled by the parent Column
                     Column(horizontalAlignment = Alignment.Start) {
-                        Text(
-                            text = "Network",
-                            color = Color.White,
-                            fontFamily = ItimFont,
-                            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+
+                        OurSpecialEventTextField(
+                            title = "Network",
+                            placeHolder = "Enter Network Name",
+                            valueText = networkName,
+                            onValueChange = { networkName = it }
                         )
-                        OutlinedTextField(
-                            value = networkName,
-                            maxLines = 1,
-                            placeholder = { Text(text = "Enter network name") },
-                            onValueChange = { networkName = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Gray10,
-                                unfocusedContainerColor = Gray30,
-                                cursorColor = MyYellow,
-                                focusedPlaceholderColor = Gray10,
-                                unfocusedPlaceholderColor = Gray10,
-                                focusedIndicatorColor = MyYellow,
-                                unfocusedIndicatorColor = Gray10
-                            )
-                        )
-                        Spacer(modifier = Modifier.size(10.dp))
                         Text(
                             text = "Password",
                             color = Color.White,
@@ -227,6 +209,7 @@ fun WifiInputCard(
                             colors = TextFieldDefaults.colors(
                                 focusedTextColor = Color.White,
                                 unfocusedTextColor = Gray10,
+                                focusedContainerColor = Gray30,
                                 unfocusedContainerColor = Gray30,
                                 cursorColor = MyYellow,
                                 focusedPlaceholderColor = Gray10,
@@ -270,12 +253,46 @@ fun formatWifiFields(networkName: String, password: String): String {
         .joinToString(separator = "\n")
 }
 
-/*
 @Preview
 @Composable
 private fun GenerateInputPreview() {
     CodeAppTheme {
-        WifiInputScreen()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Gray10)
+                .statusBarsPadding() // Handles spacing for the system status bar
+                .imePadding()       // Handles spacing for the keyboard
+        ) {
+            // Top Bar
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_back_no_bg),
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .size(32.dp) // Resized from 120.dp to a standard size
+                        .clickable { }
+                )
+                Spacer(Modifier.width(12.dp)) // Added space for balance
+                Text(
+                    text = "Wi-Fi",
+                    color = Color.White,
+                    fontFamily = ItimFont,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(80.dp))
+            // WifiInputCard now uses weight to flexibly fill the remaining space
+            WifiInputCard(
+                onGenerateClick = { },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
-*/
