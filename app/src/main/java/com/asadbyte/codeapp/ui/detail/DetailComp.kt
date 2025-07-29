@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.asadbyte.codeapp.ui.others.enhanceQRCodeForSharing
 import com.asadbyte.codeapp.ui.theme.Gray10
+import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.MyYellow
 import java.io.File
 import java.io.FileOutputStream
@@ -35,7 +36,7 @@ fun ShareOptionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Share As") },
+        title = { Text("Share As", color = Color.White) },
         text = { Text("How would you like to share this item?", color = Color.White) },
         confirmButton = {
             TextButton(onClick = onShareImage) {
@@ -47,10 +48,11 @@ fun ShareOptionDialog(
                 Text("Text", color = MyYellow)
             }
         },
+        containerColor = Gray30,
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .border(BorderStroke(2.dp, MyYellow), shape = RoundedCornerShape(16.dp))
-            .background(Gray10)
     )
 }
 
