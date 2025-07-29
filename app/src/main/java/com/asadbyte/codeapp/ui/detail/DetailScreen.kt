@@ -8,11 +8,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -61,9 +66,11 @@ fun DetailScreen(
 
     var showShareDialog by remember { mutableStateOf(false) }
 
-    if(item != null) {
+    if (item != null) {
         val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item.content)) }
-        val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
+        // This check is removed as it's not used in the provided UI logic
+        // val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
+
         if (showShareDialog) {
             ShareOptionDialog(
                 onDismiss = { showShareDialog = false },
@@ -77,11 +84,16 @@ fun DetailScreen(
                 }
             )
         }
+
+        // --- IMPROVEMENT: Made the Column scrollable and centered its children ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Gray10)
+                .verticalScroll(rememberScrollState()), // Makes the content scrollable
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Top Bar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -90,11 +102,13 @@ fun DetailScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_back_no_bg),
-                    contentDescription = null,
+                    contentDescription = "Back",
                     modifier = Modifier
                         .size(32.dp)
                         .clickable { onNavigateBack() }
                 )
+                // --- IMPROVEMENT: Added space between icon and title ---
+                Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = "Details",
                     fontFamily = ItimFont,
@@ -102,21 +116,28 @@ fun DetailScreen(
                     color = Color.White
                 )
             }
+
+            // Detail Card
             DetailCard(
                 item = item,
                 imageBitmap = bitmap!!.asImageBitmap()
             )
+
+            // Action Buttons
+            // --- IMPROVEMENT: Used SpaceEvenly for better distribution ---
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceEvenly, // Distributes buttons evenly
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp) // Adds vertical space around the buttons
             ) {
                 DetailButton(
                     imageRes = R.drawable.ic_detail_share,
                     text = "Share",
                     onClick = { showShareDialog = true }
                 )
-                if(item.type == ItemType.SCAN) {
+                if (item.type == ItemType.SCAN) {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_copy,
                         text = "Copy",
@@ -126,12 +147,17 @@ fun DetailScreen(
                     DetailButton(
                         imageRes = R.drawable.ic_detail_save,
                         text = "Save",
-                        onClick = { bitmap?.let { saveBitmapToGallery(context, it, title = "QRCode_${item.id}") } }
+                        onClick = {
+                            bitmap?.let {
+                                saveBitmapToGallery(context, it, title = "QRCode_${item.id}")
+                            }
+                        }
                     )
                 }
             }
         }
     } else {
+        // Fallback case remains the same
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -152,20 +178,21 @@ fun DetailButton(
     text: String,
     onClick: () -> Unit
 ) {
+    // --- IMPROVEMENT: Increased spacing and added padding for a larger touch target ---
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-        modifier = Modifier.clickable { onClick() }
+        verticalArrangement = Arrangement.spacedBy(8.dp), // Increased space between icon and text
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(16.dp) // Added padding for a better touch area and visual spacing
     ) {
         Image(
             painter = painterResource(id = imageRes),
-            contentDescription = null,
-            modifier = Modifier.padding(0.dp)
+            contentDescription = text // Using text as content description
         )
         Text(
             text = text,
             color = Color.White,
-            modifier = Modifier.padding(0.dp)
         )
     }
 }
@@ -181,7 +208,8 @@ fun DetailCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 30.dp)
+            // --- IMPROVEMENT: Adjusted padding for better consistency ---
+            .padding(vertical = 16.dp, horizontal = 24.dp)
             .shadow(
                 elevation = 30.dp,
                 spotColor = Color.Black,
@@ -191,19 +219,22 @@ fun DetailCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Gray30)
+                .background(Gray30),
+            // --- IMPROVEMENT: Center-align children of this column ---
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(16.dp) // Standardized padding
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_bottom_bar_scanner),
                     contentDescription = null,
                     modifier = Modifier.size(80.dp)
                 )
+                Spacer(modifier = Modifier.width(16.dp)) // Added spacer
                 Column {
                     Text(
                         text = item.type.name,
@@ -219,38 +250,33 @@ fun DetailCard(
                 color = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 30.dp)
+                    .padding(horizontal = 24.dp) // Adjusted padding
             )
             Text(
                 text = item.content,
                 color = Color.White,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 30.dp, vertical = 10.dp)
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp) // Adjusted padding
             )
             if (showQRCode) {
                 Image(
                     bitmap = imageBitmap,
-                    contentDescription = null,
+                    contentDescription = "QR Code for ${item.content}", // Added accessibility
                     modifier = Modifier
+                        // --- IMPROVEMENT: Added padding to space the QR code out ---
+                        .padding(vertical = 16.dp)
                         .size(200.dp)
-                        .align(Alignment.CenterHorizontally)
                         .border(4.dp, MyYellow)
                 )
             }
             TextButton(
                 onClick = { showQRCode = !showQRCode },
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MyYellow,
-                    disabledContainerColor = Color.Transparent,
-                    disabledContentColor = MyYellow
-                ),
-                modifier = Modifier.padding(vertical = 10.dp)
+                colors = ButtonDefaults.textButtonColors(contentColor = MyYellow), // Simplified API
+                modifier = Modifier.padding(bottom = 8.dp) // Ensure space at the bottom
             ) {
                 Text(
-                    text = if(showQRCode) "Hide QR Code" else "Show QR Code",
-                    modifier = Modifier.fillMaxWidth(),
+                    text = if (showQRCode) "Hide QR Code" else "Show QR Code",
                     textAlign = TextAlign.Center
                 )
             }

@@ -103,21 +103,12 @@ fun AppNavigation() {
             arguments = listOf(navArgument("itemId") { type = NavType.StringType })
         ) { backStackEntry ->
             val itemId = backStackEntry.arguments?.getString("itemId")
-            Log.d("HistoryHome", "ItemId recieved in detail screen: $itemId")
             if (!itemId.isNullOrBlank()) {
                 val item = historyItems.find { it.id == itemId.toLong() }
-                Log.d("HistoryHome", "ItemId sent to viewmodel: ${itemId.toLong()}")
-                // Get item by ID from your data source
-                QrCodeMain(
-                    onGenerateClick = { navController.navigate("input_graph") },
-                    onScannerClick = { navController.navigate(Screen.Scanner.route) },
-                    onHistoryClick = { navController.navigate(Screen.History.route) }
-                ) {
-                    DetailScreen(
-                        item = item,
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
+                DetailScreen(
+                    item = item,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
 
