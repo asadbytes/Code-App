@@ -6,8 +6,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,7 +27,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,7 +43,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,6 +62,13 @@ import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 
 @Composable
 fun NewResultScreen(
@@ -80,8 +85,27 @@ fun NewResultScreen(
 
     var showShareDialog by remember { mutableStateOf(false) }
 
+    // Animation states
+    var isVisible by remember { mutableStateOf(true) }
+    var isClosing by remember { mutableStateOf(false) }
+
+    // Animate back navigation with beautiful exit animation
+    val animateBack = {
+        isClosing = true
+        isVisible = false
+    }
+
+    // Listen to animation completion to trigger actual navigation
+    LaunchedEffect(isVisible) {
+        if (!isVisible && isClosing) {
+            delay(400) // Wait for animation to complete
+            onNavigateBack()
+        }
+    }
+
     if (item != null) {
         val bitmap by remember { mutableStateOf(generatorViewModel.getQrCode(item!!.content)) }
+
         if (showShareDialog) {
             ShareOptionDialog(
                 onDismiss = { showShareDialog = false },
@@ -96,30 +120,120 @@ fun NewResultScreen(
             )
         }
 
-        // --- IMPROVEMENT: Added vertical scroll and horizontal alignment ---
-        Column(
+        // OPTION 3: Shrink to Center Animation (Alternative)
+        val scale by animateFloatAsState(
+            targetValue = if (isVisible) 1f else 0f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
+        val alpha by animateFloatAsState(
+            targetValue = if (isVisible) 1f else 0f,
+            animationSpec = tween(500)
+        )
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Gray10)
-                .verticalScroll(rememberScrollState()), // Makes the entire screen scrollable
-            horizontalAlignment = Alignment.CenterHorizontally // Centers children like card, image, buttons
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                }
         ) {
-            // Top Bar
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+            ScreenContent(
+                item = item,
+                bitmap = bitmap,
+                onBackClick = animateBack,
+                onShareClick = { showShareDialog = true },
+                clipboardManager = clipboardManager,
+                context = context
+            )
+        }
+    } else {
+        // Loading state with entrance animation
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(animationSpec = tween(500))
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
+    BackHandler(enabled = true) {
+        animateBack()
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun ScreenContent(
+    item: HistoryItem,
+    bitmap: Bitmap?,
+    onBackClick: () -> Unit,
+    onShareClick: () -> Unit,
+    clipboardManager: androidx.compose.ui.platform.ClipboardManager,
+    context: Context
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Gray10)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Top Bar with individual item animations
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Animated back button
+            AnimatedContent(
+                targetState = true,
+                transitionSpec = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(400, delayMillis = 100)
+                    ) with slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) { some ->
+                if(some)
                 Image(
                     painter = painterResource(id = R.drawable.ic_back_no_bg),
                     contentDescription = "Back",
                     modifier = Modifier
                         .size(32.dp)
-                        .clickable { onNavigateBack() }
+                        .clickable { onBackClick() }
                 )
-                // --- IMPROVEMENT: Added space between icon and title ---
-                Spacer(Modifier.width(16.dp))
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            // Animated title
+            AnimatedContent(
+                targetState = true,
+                transitionSpec = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(400, delayMillis = 200)
+                    ) with slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) { some ->
+                if (some)
                 Text(
                     text = "Result",
                     fontFamily = ItimFont,
@@ -127,12 +241,32 @@ fun NewResultScreen(
                     color = Color.White,
                 )
             }
+        }
 
-            ResultCard(item = item!!)
+        // Animated Result Card
+        AnimatedVisibility(
+            visible = true,
+            enter = slideInVertically(
+                initialOffsetY = { it / 2 },
+                animationSpec = tween(500, delayMillis = 300)
+            ) + fadeIn(animationSpec = tween(400, delayMillis = 300))
+        ) {
+            ResultCard(item = item)
+        }
 
-            // --- IMPROVEMENT: Added space above the QR code ---
-            Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
+        // Animated QR Code with bounce effect
+        AnimatedVisibility(
+            visible = true,
+            enter = scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                initialScale = 0f
+            ) + fadeIn(animationSpec = tween(400, delayMillis = 400))
+        ) {
             Image(
                 bitmap = bitmap!!.asImageBitmap(),
                 contentDescription = "Generated QR Code",
@@ -140,14 +274,20 @@ fun NewResultScreen(
                     .size(200.dp)
                     .border(4.dp, MyYellow)
             )
+        }
 
-            // --- IMPROVEMENT: Added space above the action buttons ---
-            Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-            // Action Buttons
+        // Animated Action Buttons
+        AnimatedVisibility(
+            visible = true,
+            enter = slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = tween(500, delayMillis = 600)
+            ) + fadeIn(animationSpec = tween(400, delayMillis = 600))
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                // --- IMPROVEMENT: Used SpaceEvenly for better button distribution ---
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,13 +296,13 @@ fun NewResultScreen(
                 DetailButton(
                     imageRes = R.drawable.ic_detail_share,
                     text = "Share",
-                    onClick = { showShareDialog = true }
+                    onClick = onShareClick
                 )
-                if (item!!.type == ItemType.SCAN) {
+                if (item.type == ItemType.SCAN) {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_copy,
                         text = "Copy",
-                        onClick = { clipboardManager.setText(AnnotatedString(item!!.content)) }
+                        onClick = { clipboardManager.setText(AnnotatedString(item.content)) }
                     )
                 } else {
                     DetailButton(
@@ -170,26 +310,15 @@ fun NewResultScreen(
                         text = "Save",
                         onClick = {
                             bitmap?.let {
-                                saveBitmapToGallery(context, it, title = "QRCode_${item!!.id}")
+                                saveBitmapToGallery(context, it, title = "QRCode_${item.id}")
                             }
                         }
                     )
                 }
             }
         }
-    } else {
-        // Fallback case for when item is not found
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Using a CircularProgressIndicator while the item is loading (initial state is null)
-            CircularProgressIndicator()
-        }
     }
 }
-
 
 @Composable
 fun ResultCard(
@@ -234,31 +363,6 @@ fun ResultCard(
                 )
             }
         }
-    }
-}
-
-// Re-using the improved DetailButton from the previous screen
-@Composable
-fun DetailButton(
-    imageRes: Int,
-    text: String,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp), // Increased space
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(16.dp) // Added padding for a better touch area
-    ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = text // Using text as content description for accessibility
-        )
-        Text(
-            text = text,
-            color = Color.White,
-        )
     }
 }
 

@@ -22,10 +22,12 @@ fun enhanceQRCodeForSharing(originalBitmap: Bitmap): Bitmap {
     // Calculate dimensions
     val qrWithBorderSize = originalBitmap.width + (qrBorderWidth * 2).toInt()
     val totalWidth = qrWithBorderSize + (overallBorderWidth * 2).toInt()
-    val totalHeight = qrWithBorderSize + titleHeight.toInt() + (overallBorderWidth * 2).toInt() + padding.toInt()
+    val totalHeight =
+        qrWithBorderSize + titleHeight.toInt() + (overallBorderWidth * 2).toInt() + padding.toInt()
 
     // Create the final bitmap
-    val enhancedBitmap = Bitmap.createBitmap(totalWidth, totalHeight.toInt(), Bitmap.Config.ARGB_8888)
+    val enhancedBitmap =
+        Bitmap.createBitmap(totalWidth, totalHeight.toInt(), Bitmap.Config.ARGB_8888)
     val canvas = Canvas(enhancedBitmap)
 
     // Create paint objects
@@ -95,7 +97,8 @@ fun enhanceQRCodeForSharing(originalBitmap: Bitmap): Bitmap {
     )
 
     // Calculate positions for QR code
-    val qrStartX = overallBorderWidth + ((totalWidth - overallBorderWidth * 2 - qrWithBorderSize) / 2)
+    val qrStartX =
+        overallBorderWidth + ((totalWidth - overallBorderWidth * 2 - qrWithBorderSize) / 2)
     val qrStartY = overallBorderWidth + padding / 2
 
     // Draw QR code border (MyYellow)
@@ -115,42 +118,6 @@ fun enhanceQRCodeForSharing(originalBitmap: Bitmap): Bitmap {
         (qrStartY + qrBorderWidth + originalBitmap.height).toInt()
     )
     canvas.drawBitmap(originalBitmap, null, qrDestRect, null)
-
-    // Draw the app title
-    val titleY = qrStartY + qrWithBorderSize + padding
-    val titleX = totalWidth / 2f
-
-    // Add a subtle background for the title
-    val titleBackgroundPaint = Paint().apply {
-        color = Color.parseColor("#F8F8F8")
-        style = Paint.Style.FILL
-        isAntiAlias = true
-    }
-
-    val titleBounds = Rect()
-    textPaint.getTextBounds("asadbyte.qrcode", 0, "asadbyte.qrcode".length, titleBounds)
-
-    canvas.drawRoundRect(
-        titleX - titleBounds.width() / 2 - 20f,
-        titleY - titleBounds.height() - 10f,
-        titleX + titleBounds.width() / 2 + 20f,
-        titleY + 10f,
-        8f, 8f, titleBackgroundPaint
-    )
-
-    // Draw the title text
-    canvas.drawText("asadbyte.qrcode", titleX, titleY, textPaint)
-
-    // Add a small decorative element
-    /*val decorativePaint = Paint().apply {
-        color = MyYellow.toArgb()
-        style = Paint.Style.FILL
-        isAntiAlias = true
-    }*/
-
-   /* // Small circles as decoration
-    canvas.drawCircle(titleX - titleBounds.width() / 2 - 40f, titleY - titleBounds.height() / 2, 4f, decorativePaint)
-    canvas.drawCircle(titleX + titleBounds.width() / 2 + 40f, titleY - titleBounds.height() / 2, 4f, decorativePaint)*/
 
     return enhancedBitmap
 }
