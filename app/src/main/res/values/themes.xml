@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.CodeApp" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.CodeApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="windowSplashScreenBackground">@color/gray_333</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/new_launcher_icon</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+    </style>
+
+    <style name="Theme.CodeApp.Splash" parent="Theme.CodeApp">
+        <item name="android:windowBackground">@color/gray_333</item>
+        <item name="windowSplashScreenBackground">@color/gray_333</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/new_launcher_icon</item>
+    </style>
 
     <!-- Transparent theme to bypass system splash -->
     <style name="Theme.Transparent" parent="Theme.CodeApp">
@@ -12,4 +23,5 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
+
 </resources>
