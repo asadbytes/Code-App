@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,8 +23,9 @@ import com.asadbyte.codeapp.ui.detail.DetailScreen
 import com.asadbyte.codeapp.ui.generator.input.inputGraph
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
+import com.asadbyte.codeapp.ui.onboarding.OnboardingPreferences
 import com.asadbyte.codeapp.ui.others.QrCodeMain
-import com.asadbyte.codeapp.ui.others.StartScreen
+import com.asadbyte.codeapp.ui.onboarding.StartScreen
 import com.asadbyte.codeapp.ui.scanner.NewResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerScreen
 import kotlinx.coroutines.delay
@@ -52,6 +51,16 @@ fun AppNavigation() {
     val bitmapCache = remember { mutableMapOf<String, Bitmap>() }
     val historyViewModel: HistoryViewModel = hiltViewModel()
     val historyItems by historyViewModel.history.collectAsState()
+
+    val context = LocalContext.current
+    val onboardingPrefs = remember { OnboardingPreferences.getInstance(context) }
+
+    val startDestination = if (onboardingPrefs.hasSeenStartScreen()) {
+        Screen.Scanner.route
+    } else {
+        Screen.StartScreen.route
+    }
+
 
     val scope = rememberCoroutineScope()
     val navigationMutex = remember { Mutex() }
@@ -91,12 +100,16 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.StartScreen.route,
+        startDestination = startDestination,
         modifier = Modifier.fillMaxSize()
     ) {
         composable(Screen.StartScreen.route) {
             StartScreen(
                 onArrowClick = {
+                    // Mark intro as seen
+                    onboardingPrefs.setHasSeenStartScreen()
+
+                    // Navigate and remove StartScreen from backstack
                     navController.navigate(Screen.Scanner.route) {
                         popUpTo(Screen.StartScreen.route) {
                             inclusive = true
@@ -105,6 +118,7 @@ fun AppNavigation() {
                 }
             )
         }
+
         // Scanner Screen
         composable(Screen.Scanner.route) {
             QrCodeMain(

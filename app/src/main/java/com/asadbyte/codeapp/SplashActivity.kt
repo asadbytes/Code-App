@@ -21,8 +21,16 @@ class SplashActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
 
+        val app = application as MyApplication
+        if (!app.isAppColdStarted) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
         setContent {
             CustomSplashScreen {
+                app.isAppColdStarted = false
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
