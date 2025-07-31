@@ -20,7 +20,8 @@ import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.settings.SettingsScreen
 import com.asadbyte.codeapp.ui.detail.DetailScreen
-import com.asadbyte.codeapp.ui.generator.input.inputGraph
+import com.asadbyte.codeapp.ui.generator.InputScreens
+import com.asadbyte.codeapp.ui.generator.inputGraph
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
 import com.asadbyte.codeapp.ui.onboarding.OnboardingPreferences
@@ -56,7 +57,7 @@ fun AppNavigation() {
     val onboardingPrefs = remember { OnboardingPreferences.getInstance(context) }
 
     val startDestination = if (onboardingPrefs.hasSeenStartScreen()) {
-        Screen.Scanner.route
+        "input_graph"
     } else {
         Screen.StartScreen.route
     }
@@ -122,9 +123,17 @@ fun AppNavigation() {
         // Scanner Screen
         composable(Screen.Scanner.route) {
             QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph") },
+                onGenerateClick = { navController.navigate("input_graph") {
+                    popUpTo(Screen.Scanner.route) {
+                        inclusive = true
+                    }
+                } },
                 onScannerClick = { },
-                onHistoryClick = { navController.navigate(Screen.History.route) }
+                onHistoryClick = { navController.navigate(Screen.History.route) {
+                    popUpTo(Screen.Scanner.route) {
+                        inclusive = true
+                    }
+                } }
             ) {
                 ScannerScreen(
                     onResult = { scannerId ->
@@ -148,8 +157,16 @@ fun AppNavigation() {
 
         composable(Screen.History.route) {
             QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph") },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) },
+                onGenerateClick = { navController.navigate("input_graph") {
+                    popUpTo(Screen.History.route) {
+                        inclusive = true
+                    }
+                } },
+                onScannerClick = { navController.navigate(Screen.Scanner.route) {
+                    popUpTo(Screen.History.route) {
+                        inclusive = true
+                    }
+                } },
                 onHistoryClick = { }
             ) {
                 HistoryScreen(

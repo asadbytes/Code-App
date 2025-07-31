@@ -179,13 +179,6 @@ fun HistoryScreen(
                         contentDescription = "Delete Selected",
                         modifier = Modifier.size(22.dp)
                     )
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_settings),
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(24.dp),
-                        tint = MyYellow
-                    )
                 }
             }
         }

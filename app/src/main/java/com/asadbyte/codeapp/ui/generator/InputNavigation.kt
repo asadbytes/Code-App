@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.ui.generator.input
+package com.asadbyte.codeapp.ui.generator
 
 import android.util.Log
 import androidx.navigation.NavController
@@ -8,7 +8,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.asadbyte.codeapp.ui.Screen
-import com.asadbyte.codeapp.ui.generator.GenerateMainScreen
+import com.asadbyte.codeapp.ui.generator.input.BusinessInputScreen
+import com.asadbyte.codeapp.ui.generator.input.ContactInputScreen
+import com.asadbyte.codeapp.ui.generator.input.EventInputScreen
+import com.asadbyte.codeapp.ui.generator.input.GenerateInputHandler
+import com.asadbyte.codeapp.ui.generator.input.WifiInputScreen
+import com.asadbyte.codeapp.ui.generator.input.inputCardData
 import com.asadbyte.codeapp.ui.scanner.NewResultScreen
 import com.asadbyte.codeapp.ui.others.QrCodeMain
 
