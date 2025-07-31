@@ -76,8 +76,6 @@ To build the app from source using the command line:
 
 The signed release APK will be located in:
 
-Copy
-Edit
 app/build/outputs/apk/release/
 
 -----
