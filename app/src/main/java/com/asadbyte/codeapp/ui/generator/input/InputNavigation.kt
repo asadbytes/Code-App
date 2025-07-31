@@ -31,6 +31,8 @@ object InputScreens {
 
 fun NavGraphBuilder.inputGraph(
     navController: NavController,
+    navigateToInputScreen: (String) -> Any,
+    onNavigateBackFromInput: () -> Boolean,
 ) {
     Log.d("input_graph", "entered input graph")
     navigation(
@@ -45,14 +47,14 @@ fun NavGraphBuilder.inputGraph(
             ) {
                 GenerateMainScreen(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
-                    navController = navController
+                    navigateToInputScreen = navigateToInputScreen,
                 )
             }
         }
         composable(InputScreens.TEXT) {
             GenerateInputHandler(
                 cardData = inputCardData["text"]!!,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -61,7 +63,7 @@ fun NavGraphBuilder.inputGraph(
         composable(InputScreens.WEBSITE) {
             GenerateInputHandler(
                 cardData = inputCardData["website"]!!,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -71,7 +73,7 @@ fun NavGraphBuilder.inputGraph(
         composable(InputScreens.LOCATION) {
             GenerateInputHandler(
                 cardData = inputCardData["location"]!!,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -80,7 +82,7 @@ fun NavGraphBuilder.inputGraph(
 
         composable(InputScreens.WIFI) {
             WifiInputScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -89,7 +91,7 @@ fun NavGraphBuilder.inputGraph(
 
         composable(InputScreens.BUSINESS) {
             BusinessInputScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -98,7 +100,7 @@ fun NavGraphBuilder.inputGraph(
 
         composable(InputScreens.CONTACT) {
             ContactInputScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -107,43 +109,17 @@ fun NavGraphBuilder.inputGraph(
 
         composable(InputScreens.EVENT) {
             EventInputScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
             )
         }
-        composable(InputScreens.WHATSAPP) {
-            GenerateInputHandler(
-                cardData = inputCardData["whatsapp"]!!,
-                onNavigateBack = { navController.popBackStack() },
-                onQrCodeGenerated = { generateId ->
-                    navController.navigate("input_result/$generateId")
-                }
-            )
-        }
-        composable(InputScreens.TWITTER) {
-            GenerateInputHandler(
-                cardData = inputCardData["twitter"]!!,
-                onNavigateBack = { navController.popBackStack() },
-                onQrCodeGenerated = { generateId ->
-                    navController.navigate("input_result/$generateId")
-                }
-            )
-        }
+
         composable(InputScreens.EMAIL) {
             GenerateInputHandler(
                 cardData = inputCardData["email"]!!,
-                onNavigateBack = { navController.popBackStack() },
-                onQrCodeGenerated = { generateId ->
-                    navController.navigate("input_result/$generateId")
-                }
-            )
-        }
-        composable(InputScreens.INSTAGRAM) {
-            GenerateInputHandler(
-                cardData = inputCardData["instagram"]!!,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
                 }
@@ -152,7 +128,7 @@ fun NavGraphBuilder.inputGraph(
         composable(InputScreens.PHONE) {
             GenerateInputHandler(
                 cardData = inputCardData["phone"]!!,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId -> navController.navigate("input_result/$generateId")
                 }
             )
@@ -176,3 +152,18 @@ fun NavGraphBuilder.inputGraph(
         }
     }
 }
+
+
+
+
+val exclusiveInputScreens = setOf(
+    InputScreens.TEXT,
+    InputScreens.WEBSITE,
+    InputScreens.WIFI,
+    InputScreens.EVENT,
+    InputScreens.CONTACT,
+    InputScreens.BUSINESS,
+    InputScreens.LOCATION,
+    InputScreens.EMAIL,
+    InputScreens.PHONE
+)

@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.generator.input.InputScreens
+import com.asadbyte.codeapp.ui.others.disableMultiTouch
+import com.asadbyte.codeapp.ui.others.singleClickable
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
 import com.asadbyte.codeapp.ui.theme.ItimFont
@@ -39,12 +41,13 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 @Composable
 fun GenerateMainScreen(
     onSettingsClick: () -> Unit,
-    navController: NavController,
+    navigateToInputScreen: (String) -> Any,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray10)
+            .disableMultiTouch()
     ) {
 
         Spacer(modifier = Modifier.height(5.dp))
@@ -92,7 +95,7 @@ fun GenerateMainScreen(
                     painter = painterResource(homeItem.icon),
                     contentDescription = null,
                     modifier = Modifier
-                        .clickable { navController.navigate(homeItem.path) }
+                        .singleClickable { navigateToInputScreen(homeItem.path) }
                         .aspectRatio(1f)
                 )
             }
@@ -143,15 +146,3 @@ data class GenerateHomeItem(
     val icon: Int,
     val path: String
 )
-
-@Preview
-@Composable
-private fun GenerateHomePreview() {
-    CodeAppTheme {
-        GenerateMainScreen(
-            onSettingsClick = {},
-            navController = NavController(LocalContext.current)
-        )
-
-    }
-}

@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -25,6 +29,9 @@ import com.asadbyte.codeapp.ui.others.QrCodeMain
 import com.asadbyte.codeapp.ui.others.StartScreen
 import com.asadbyte.codeapp.ui.scanner.NewResultScreen
 import com.asadbyte.codeapp.ui.scanner.ScannerScreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 sealed class Screen(val route: String, val label: String, @DrawableRes val icon: Int) {
     data object StartScreen : Screen("start_screen", "Start", R.drawable.ic_start_screen_qrcode)
@@ -38,13 +45,49 @@ sealed class Screen(val route: String, val label: String, @DrawableRes val icon:
 
 val bottomNavItems = listOf(Screen.Scanner, Screen.Generator, Screen.History)
 
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    // A simple in-memory cache for passing bitmaps
     val bitmapCache = remember { mutableMapOf<String, Bitmap>() }
     val historyViewModel: HistoryViewModel = hiltViewModel()
     val historyItems by historyViewModel.history.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val navigationMutex = remember { Mutex() }
+
+    // 2. DEFINE THE UPDATED NAVIGATION LOGIC
+    val navigateToInputScreen = { destinationRoute: String ->
+        scope.launch {
+            if (navigationMutex.tryLock()) {
+                // Lock acquired. Now, set up the failsafe and navigate.
+
+                // FAILSAFE WATCHDOG: Launch a task to auto-unlock after a delay.
+                // This prevents the app from getting stuck if navigation fails.
+                scope.launch {
+                    delay(2500L) // 2.5-second timeout
+                    if (navigationMutex.isLocked) {
+                        Log.w("NavigationFailsafe", "Navigation likely failed or is taking too long. Forcing unlock.")
+                        navigationMutex.unlock()
+                    }
+                }
+
+                // PROCEED WITH NAVIGATION
+                navController.navigate(destinationRoute)
+            } else {
+                Log.d("Navigation", "Blocked by Mutex. Navigation already in progress.")
+            }
+        }
+    }
+
+    // 3. DEFINE THE UPDATED BACK NAVIGATION
+    val onNavigateBackFromInput = {
+        // Only unlock if the mutex is currently locked to avoid errors.
+        if (navigationMutex.isLocked) {
+            navigationMutex.unlock()
+        }
+        navController.popBackStack()
+    }
 
     NavHost(
         navController = navController,
@@ -53,7 +96,13 @@ fun AppNavigation() {
     ) {
         composable(Screen.StartScreen.route) {
             StartScreen(
-                onArrowClick = { navController.navigate(Screen.Scanner.route) }
+                onArrowClick = {
+                    navController.navigate(Screen.Scanner.route) {
+                        popUpTo(Screen.StartScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         // Scanner Screen
@@ -116,6 +165,10 @@ fun AppNavigation() {
             SettingsScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        inputGraph(navController = navController)
+        inputGraph(
+            navController = navController,
+            navigateToInputScreen = navigateToInputScreen,
+            onNavigateBackFromInput = { onNavigateBackFromInput() }
+        )
     }
 }
