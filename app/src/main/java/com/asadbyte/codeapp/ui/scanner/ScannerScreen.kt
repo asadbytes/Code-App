@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -55,8 +56,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.asadbyte.codeapp.MainActivity
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.domain.QRScanner
+import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray30
 import com.asadbyte.codeapp.ui.theme.MyYellow
@@ -70,7 +73,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScannerScreen(
     onResult: (Long) -> Unit,
-    scannerViewModel: ScannerViewModel = hiltViewModel()
+    scannerViewModel: ScannerViewModel = hiltViewModel(),
+    adViewModel: AdViewModel
 ) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val context = LocalContext.current
@@ -111,6 +115,10 @@ fun ScannerScreen(
     val uiState by scannerViewModel.uiState.collectAsState()
     LaunchedEffect(uiState.scannedId) {
         if (uiState.scannedId != null) {
+            Log.d("ScannerScreen", "Is Interstitial Ready: ${adViewModel.uiState.value.isInterstitialReady}")
+            adViewModel.showInterstitialAd(
+                activity = context as MainActivity
+            )
             onResult(uiState.scannedId!!)
             scannerViewModel.resetState()
         }

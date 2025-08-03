@@ -32,11 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.asadbyte.codeapp.MainActivity
 import com.asadbyte.codeapp.R
+import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 import com.asadbyte.codeapp.ui.generator.GeneratorViewModel
 import com.asadbyte.codeapp.ui.theme.CodeAppTheme
 import com.asadbyte.codeapp.ui.theme.Gray10
@@ -50,10 +53,12 @@ fun GenerateInputHandler(
     cardData: SimpleInputCardData,
     onNavigateBack: () -> Unit,
     generatorViewModel: GeneratorViewModel = hiltViewModel(),
+    adViewModel: AdViewModel,
     onQrCodeGenerated: (Long) -> Unit
 ) {
     val text by generatorViewModel.inputText.collectAsState()
     val uiState by generatorViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -98,6 +103,9 @@ fun GenerateInputHandler(
     }
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
+            adViewModel.showInterstitialAd(
+                activity = context as MainActivity
+            )
             onQrCodeGenerated(uiState.generatedId!!)
             generatorViewModel.clearGeneratedQrCode()
         }

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.asadbyte.codeapp.ui.Screen
+import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 import com.asadbyte.codeapp.ui.generator.input.BusinessInputScreen
 import com.asadbyte.codeapp.ui.generator.input.ContactInputScreen
 import com.asadbyte.codeapp.ui.generator.input.EventInputScreen
@@ -38,6 +39,7 @@ fun NavGraphBuilder.inputGraph(
     navController: NavController,
     navigateToInputScreen: (String) -> Any,
     onNavigateBackFromInput: () -> Boolean,
+    adViewModel: AdViewModel,
 ) {
     Log.d("input_graph", "entered input graph")
     navigation(
@@ -62,7 +64,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
         composable(InputScreens.WEBSITE) {
@@ -71,7 +74,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -81,7 +85,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -90,7 +95,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -99,7 +105,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -108,7 +115,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -117,7 +125,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 
@@ -127,7 +136,8 @@ fun NavGraphBuilder.inputGraph(
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId ->
                     navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
         composable(InputScreens.PHONE) {
@@ -135,7 +145,8 @@ fun NavGraphBuilder.inputGraph(
                 cardData = inputCardData["phone"]!!,
                 onNavigateBack = { onNavigateBackFromInput() },
                 onQrCodeGenerated = { generateId -> navController.navigate("input_result/$generateId")
-                }
+                },
+                adViewModel = adViewModel
             )
         }
 

@@ -53,15 +53,19 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalContext
+import com.asadbyte.codeapp.MainActivity
+import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 
 @Composable
 fun EventInputScreen(
     onNavigateBack: () -> Unit,
     generatorViewModel: GeneratorViewModel = hiltViewModel(),
+    adViewModel: AdViewModel,
     onQrCodeGenerated: (Long) -> Unit
 ) {
     val uiState by generatorViewModel.uiState.collectAsState()
-
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,6 +109,9 @@ fun EventInputScreen(
     // Your LaunchedEffect logic is untouched
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
+            adViewModel.showInterstitialAd(
+                activity = context as MainActivity
+            )
             onQrCodeGenerated(uiState.generatedId!!)
             generatorViewModel.clearGeneratedQrCode()
         }

@@ -19,8 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.settings.SettingsScreen
+import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 import com.asadbyte.codeapp.ui.detail.DetailScreen
-import com.asadbyte.codeapp.ui.generator.InputScreens
 import com.asadbyte.codeapp.ui.generator.inputGraph
 import com.asadbyte.codeapp.ui.history.HistoryScreen
 import com.asadbyte.codeapp.ui.history.HistoryViewModel
@@ -47,7 +47,7 @@ val bottomNavItems = listOf(Screen.Scanner, Screen.Generator, Screen.History)
 
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(adViewModel: AdViewModel) {
     val navController = rememberNavController()
     val bitmapCache = remember { mutableMapOf<String, Bitmap>() }
     val historyViewModel: HistoryViewModel = hiltViewModel()
@@ -138,7 +138,8 @@ fun AppNavigation() {
                 ScannerScreen(
                     onResult = { scannerId ->
                         navController.navigate("scan_result/$scannerId")
-                    }
+                    },
+                    adViewModel = adViewModel
                 )
             }
         }
@@ -199,7 +200,8 @@ fun AppNavigation() {
         inputGraph(
             navController = navController,
             navigateToInputScreen = navigateToInputScreen,
-            onNavigateBackFromInput = { onNavigateBackFromInput() }
+            onNavigateBackFromInput = { onNavigateBackFromInput() },
+            adViewModel = adViewModel
         )
     }
 }
