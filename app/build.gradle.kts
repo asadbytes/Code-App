@@ -95,4 +95,12 @@ dependencies {
 
     // splashscreen
     implementation("androidx.core:core-splashscreen:1.0.1")
+    // ads
+    implementation("com.google.android.gms:play-services-ads:24.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-process:2.9.2")
+
+    // guava
+    implementation("com.google.guava:guava:31.1-android")
 }
