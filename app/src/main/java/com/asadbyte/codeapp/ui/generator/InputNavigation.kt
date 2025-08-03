@@ -55,6 +55,7 @@ fun NavGraphBuilder.inputGraph(
                 GenerateMainScreen(
                     onSettingsClick = { navController.navigate(Screen.Settings.route) },
                     navigateToInputScreen = navigateToInputScreen,
+                    adViewModel = adViewModel
                 )
             }
         }
