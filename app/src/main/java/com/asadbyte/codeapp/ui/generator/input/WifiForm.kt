@@ -1,5 +1,6 @@
 package com.asadbyte.codeapp.ui.generator.input
 
+import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,7 +43,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -125,6 +130,7 @@ fun WifiInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     // Your state logic is untouched
     var networkName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -183,7 +189,8 @@ fun WifiInputCard(
                             title = "Network",
                             placeHolder = "Enter Network Name",
                             valueText = networkName,
-                            onValueChange = { networkName = it }
+                            onValueChange = { networkName = it },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         Text(
                             text = "Password",
@@ -223,6 +230,10 @@ fun WifiInputCard(
                                 unfocusedPlaceholderColor = Gray10,
                                 focusedIndicatorColor = MyYellow,
                                 unfocusedIndicatorColor = Gray10
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = { focusManager.clearFocus() }
                             )
                         )
                     }

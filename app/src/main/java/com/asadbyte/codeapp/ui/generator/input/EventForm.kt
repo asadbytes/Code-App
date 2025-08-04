@@ -52,8 +52,12 @@ import com.asadbyte.codeapp.ui.theme.ItimFont
 import com.asadbyte.codeapp.ui.theme.MyYellow
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import com.asadbyte.codeapp.MainActivity
 import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 
@@ -123,6 +127,7 @@ fun EventInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     // Your state logic is untouched
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
@@ -181,19 +186,22 @@ fun EventInputCard(
                         title = "Event Name",
                         placeHolder = "Enter event name",
                         valueText = eventName,
-                        onValueChange = { eventName = it }
+                        onValueChange = { eventName = it },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
                     OurSpecialEventTextField(
                         title = "Event Date and Time",
                         placeHolder = "12 Dec 2022, 10:40 pm",
                         valueText = eventDate,
-                        onValueChange = { eventDate = it }
+                        onValueChange = { eventDate = it },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
                     OurSpecialEventTextField(
                         title = "Event Location",
                         placeHolder = "Enter Location",
                         valueText = eventLocation,
-                        onValueChange = { eventLocation = it }
+                        onValueChange = { eventLocation = it },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
                     OurSpecialEventTextField(
                         title = "Description",
@@ -201,7 +209,11 @@ fun EventInputCard(
                         valueText = eventDescription,
                         onValueChange = { eventDescription = it },
                         maxLines = 3,
-                        modifier = Modifier.height(130.dp)
+                        modifier = Modifier.height(130.dp),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() }
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -246,6 +258,8 @@ fun OurSpecialEventTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     maxLines: Int = 1,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     Text(
         text = title,
@@ -272,7 +286,9 @@ fun OurSpecialEventTextField(
             unfocusedPlaceholderColor = Gray10,
             focusedIndicatorColor = MyYellow,
             unfocusedIndicatorColor = Gray10
-        )
+        ),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
 }
 

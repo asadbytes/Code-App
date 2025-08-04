@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,7 +35,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -120,6 +124,8 @@ fun SimpleInputCard(
     onGenerateClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+
     Card(
         modifier = modifier
             .padding(horizontal = 20.dp)
@@ -164,7 +170,11 @@ fun SimpleInputCard(
                     title = cardData.title,
                     placeHolder = cardData.placeholder,
                     valueText = textValue,
-                    onValueChange = { onValueChange(it) }
+                    onValueChange = { onValueChange(it) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    )
                 )
 
                 Spacer(modifier = Modifier.size(40.dp))
@@ -242,18 +252,22 @@ val inputCardData = mapOf(
 private fun InputHolderPreview() {
     CodeAppTheme {
         Column(
-            modifier = Modifier.fillMaxSize().background(Gray10)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Gray10)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_back_no_bg),
                     contentDescription = null,
                     modifier = Modifier
                         .size(32.dp)
-                        .clickable {  }
+                        .clickable { }
                 )
                 Text(
                     text = "Text",

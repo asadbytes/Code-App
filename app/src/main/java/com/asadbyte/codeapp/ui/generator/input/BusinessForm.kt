@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +49,8 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import com.asadbyte.codeapp.MainActivity
 import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 
@@ -143,6 +147,7 @@ fun BusinessInputCard(
     onGenerateClick: (BusinessDetailsState) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     // State holder remains the same
     var details by remember { mutableStateOf(BusinessDetailsState()) }
 
@@ -191,14 +196,16 @@ fun BusinessInputCard(
                         title = "Company Name",
                         placeHolder = "Enter name",
                         valueText = details.companyName,
-                        onValueChange = { details = details.copy(companyName = it) }
+                        onValueChange = { details = details.copy(companyName = it) },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
 
                     OurSpecialContactTextField(
                         title = "Industry",
                         placeHolder = "e.g Food/Agency",
                         valueText = details.industry,
-                        onValueChange = { details = details.copy(industry = it) }
+                        onValueChange = { details = details.copy(industry = it) },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
 
                     Row(
@@ -210,14 +217,16 @@ fun BusinessInputCard(
                             placeHolder = "Enter phone",
                             valueText = details.phone,
                             onValueChange = { details = details.copy(phone = it) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         OurSpecialContactTextField(
                             title = "Email",
                             placeHolder = "Enter email",
                             valueText = details.email,
                             onValueChange = { details = details.copy(email = it) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     }
 
@@ -226,6 +235,7 @@ fun BusinessInputCard(
                         placeHolder = "Enter address",
                         valueText = details.address,
                         onValueChange = { details = details.copy(address = it) },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
 
                     Row(
@@ -237,14 +247,19 @@ fun BusinessInputCard(
                             placeHolder = "Enter city",
                             valueText = details.city,
                             onValueChange = { details = details.copy(city = it) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         OurSpecialContactTextField(
                             title = "Country",
                             placeHolder = "Enter country",
                             valueText = details.country,
                             onValueChange = { details = details.copy(country = it) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = { focusManager.clearFocus() }
+                            )
                         )
                     }
 

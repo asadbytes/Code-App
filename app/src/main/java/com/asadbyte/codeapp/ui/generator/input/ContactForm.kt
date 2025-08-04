@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,7 +38,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.asadbyte.codeapp.MainActivity
@@ -118,6 +122,7 @@ fun ContactInputCard(
     onGenerateClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     // State logic is untouched
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -183,7 +188,8 @@ fun ContactInputCard(
                             placeHolder = "Enter name",
                             valueText = firstName,
                             onValueChange = { firstName = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         Spacer(Modifier.width(8.dp))
                         OurSpecialContactTextField(
@@ -191,7 +197,8 @@ fun ContactInputCard(
                             placeHolder = "Enter Name",
                             valueText = lastName,
                             onValueChange = { lastName = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     }
 
@@ -203,7 +210,8 @@ fun ContactInputCard(
                             placeHolder = "Enter comp...",
                             valueText = companyName,
                             onValueChange = { companyName = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         Spacer(Modifier.width(8.dp))
                         OurSpecialContactTextField(
@@ -211,7 +219,8 @@ fun ContactInputCard(
                             placeHolder = "Enter job",
                             valueText = jobName,
                             onValueChange = { jobName = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     }
 
@@ -223,7 +232,8 @@ fun ContactInputCard(
                             placeHolder = "Enter phone",
                             valueText = phone,
                             onValueChange = { phone = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         Spacer(Modifier.width(8.dp))
                         OurSpecialContactTextField(
@@ -231,7 +241,8 @@ fun ContactInputCard(
                             placeHolder = "Enter email",
                             valueText = email,
                             onValueChange = { email = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     }
 
@@ -242,6 +253,7 @@ fun ContactInputCard(
                         placeHolder = "Enter address",
                         valueText = address,
                         onValueChange = { address = it },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -252,7 +264,8 @@ fun ContactInputCard(
                             placeHolder = "Enter city",
                             valueText = city,
                             onValueChange = { city = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                         Spacer(Modifier.width(8.dp))
                         OurSpecialContactTextField(
@@ -260,7 +273,11 @@ fun ContactInputCard(
                             placeHolder = "Enter country",
                             valueText = country,
                             onValueChange = { country = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = { focusManager.clearFocus() }
+                            )
                         )
                     }
 
@@ -337,6 +354,8 @@ fun OurSpecialContactTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     maxLines: Int = 1,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     Column(
         modifier = modifier
@@ -366,7 +385,9 @@ fun OurSpecialContactTextField(
                 unfocusedPlaceholderColor = Gray10,
                 focusedIndicatorColor = MyYellow,
                 unfocusedIndicatorColor = Gray10
-            )
+            ),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions
         )
     }
 }
