@@ -18,7 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.asadbyte.codeapp.R
-import com.asadbyte.codeapp.settings.SettingsScreen
+import com.asadbyte.codeapp.ui.settings.SettingsScreen
 import com.asadbyte.codeapp.ui.adsMob.AdViewModel
 import com.asadbyte.codeapp.ui.detail.DetailScreen
 import com.asadbyte.codeapp.ui.generator.inputGraph

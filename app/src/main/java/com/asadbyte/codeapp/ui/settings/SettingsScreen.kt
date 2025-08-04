@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.settings
+package com.asadbyte.codeapp.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -170,8 +170,12 @@ fun SettingsScreen(
                 title = "Share",
                 subtitle = "Share with your friends",
                 modifier = Modifier.clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, playStoreUrl.toUri())
-                    context.startActivity(intent)
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, "Check out this awesome app!")
+                        putExtra(Intent.EXTRA_TEXT, "Hey, try this app: https://play.google.com/store/apps/details?id=${context.packageName}")
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share via"))
                 }
             )
 

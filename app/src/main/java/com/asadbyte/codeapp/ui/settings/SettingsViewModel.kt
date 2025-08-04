@@ -1,4 +1,4 @@
-package com.asadbyte.codeapp.settings
+package com.asadbyte.codeapp.ui.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
