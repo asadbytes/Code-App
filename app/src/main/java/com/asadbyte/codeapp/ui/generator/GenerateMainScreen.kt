@@ -48,9 +48,9 @@ fun GenerateMainScreen(
     adViewModel: AdViewModel
 ) {
     val adUiState by adViewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         adViewModel.loadNativeAd()
-    }
+    }*/
 
     // KEY FIX: Use LazyVerticalGrid as the main container for the whole screen.
     // This makes the entire content area (header, icons, ad) scrollable together.
@@ -109,20 +109,20 @@ fun GenerateMainScreen(
         item(span = { GridItemSpan(maxLineSpan) }) {
             val nativeAd = adUiState.nativeAd
             if (nativeAd != null) {
-                NativeAdView(
+                /*NativeAdView(
                     nativeAd = nativeAd,
                     modifier = Modifier.fillMaxWidth()
-                )
+                )*/
             } else if (adUiState.isNativeLoading) {
                 // Optional: Show a placeholder while the ad is loading
-                Box(
+                /*Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp), // Approx height of your ad
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
-                }
+                }*/
             }
         }
         item {

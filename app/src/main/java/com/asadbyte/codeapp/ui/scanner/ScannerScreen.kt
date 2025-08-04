@@ -116,9 +116,9 @@ fun ScannerScreen(
     LaunchedEffect(uiState.scannedId) {
         if (uiState.scannedId != null) {
             Log.d("ScannerScreen", "Is Interstitial Ready: ${adViewModel.uiState.value.isInterstitialReady}")
-            adViewModel.showInterstitialAd(
+            /*adViewModel.showInterstitialAd(
                 activity = context as MainActivity
-            )
+            )*/
             onResult(uiState.scannedId!!)
             scannerViewModel.resetState()
         }

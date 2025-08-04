@@ -20,25 +20,25 @@ class MainActivity : ComponentActivity() {
     private val adViewModel: AdViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val splash = installSplashScreen()
+        /*val splash = installSplashScreen()
         splash.setKeepOnScreenCondition {
             adViewModel.uiState.value.isAppLoading
-        }
+        }*/
         setContent {
-            adViewModel.handleInitialAppLoad(this)
-            val uiState by adViewModel.uiState.collectAsStateWithLifecycle()
+            /*adViewModel.handleInitialAppLoad(this)
+            val uiState by adViewModel.uiState.collectAsStateWithLifecycle()*/
 
             CodeAppTheme {
-                if(!uiState.isAppLoading) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        AppNavigation(
-                            adViewModel = adViewModel
-                        )
-                    }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation(
+                        adViewModel = adViewModel
+                    )
                 }
+                /*if(!uiState.isAppLoading) {
+                }*/
             }
         }
     }

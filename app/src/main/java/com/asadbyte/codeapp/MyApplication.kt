@@ -11,7 +11,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        MobileAds.initialize(this)
+        //MobileAds.initialize(this)
         preferences = QRScannerPreferences.getInstance(this)
     }
 }

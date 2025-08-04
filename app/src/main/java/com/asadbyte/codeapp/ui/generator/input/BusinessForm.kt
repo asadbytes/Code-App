@@ -133,9 +133,9 @@ fun BusinessInputScreen(
     // LaunchedEffect remains the same
     LaunchedEffect(uiState.generatedId) {
         if (uiState.generatedId != null) {
-            adViewModel.showInterstitialAd(
+            /*adViewModel.showInterstitialAd(
                 activity = context as MainActivity
-            )
+            )*/
             onQrCodeGenerated(uiState.generatedId!!)
             generatorViewModel.clearGeneratedQrCode()
         }

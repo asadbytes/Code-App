@@ -107,9 +107,9 @@ fun ContactInputScreen(
     // This logic remains untouched
     LaunchedEffect(uiState.generatedId) {
         if (uiState.capturedBitmap != null) {
-            adViewModel.showInterstitialAd(
+            /*adViewModel.showInterstitialAd(
                 activity = context as MainActivity
-            )
+            )*/
             onQrCodeGenerated(uiState.generatedId!!)
             generatorViewModel.clearGeneratedQrCode()
         }
