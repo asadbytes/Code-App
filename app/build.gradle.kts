@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,7 +17,7 @@ android {
         applicationId = "com.asadbyte.codeapp"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
+        versionCode = 3
         versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -40,6 +43,23 @@ android {
     buildFeatures {
         compose = true
     }
+
+    applicationVariants.all {
+        val variant = this
+        outputs.all {
+            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
+            val versionName = variant.versionName
+            val versionCode = variant.versionCode
+            val buildType = variant.buildType.name
+            val flavorName = variant.flavorName.takeIf { it.isNotBlank() } ?: "noflavor"
+            val date = SimpleDateFormat("yyyy-MM-dd").format(Date())
+
+            val newName = "qr_code_v${versionName}_code${versionCode}_${buildType}_${flavorName}_$date.${outputImpl.outputFile.extension}"
+            outputImpl.outputFileName = newName
+        }
+    }
+
 }
 
 dependencies {
