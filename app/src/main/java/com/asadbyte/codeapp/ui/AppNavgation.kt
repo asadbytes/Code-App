@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.asadbyte.codeapp.InAppUpdateHandler
 import com.asadbyte.codeapp.R
 import com.asadbyte.codeapp.ui.settings.SettingsScreen
 import com.asadbyte.codeapp.ui.adsMob.AdViewModel
@@ -102,8 +103,7 @@ fun AppNavigation(adViewModel: AdViewModel) {
         navController.popBackStack()
     }
 
-    val systemBarPaddingModifier = Modifier
-
+    InAppUpdateHandler()
     NavHost(
         navController = navController,
         startDestination = startDestination,

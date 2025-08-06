@@ -125,4 +125,6 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
     // icons extended
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    // in app update api playstore
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
 }
