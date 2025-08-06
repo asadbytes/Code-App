@@ -5,8 +5,12 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -103,112 +107,123 @@ fun AppNavigation(adViewModel: AdViewModel) {
         navController.popBackStack()
     }
 
-    InAppUpdateHandler()
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)
-    ) {
-        composable(Screen.StartScreen.route) {
-            StartScreen(
-                onArrowClick = {
-                    // Mark intro as seen
-                    onboardingPrefs.setHasSeenStartScreen()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarCoroutineScope = rememberCoroutineScope()
 
-                    // Navigate and remove StartScreen from backstack
-                    navController.navigate(Screen.Scanner.route) {
-                        popUpTo(Screen.StartScreen.route) {
-                            inclusive = true
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) },
+        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            composable(Screen.StartScreen.route) {
+                StartScreen(
+                    onArrowClick = {
+                        // Mark intro as seen
+                        onboardingPrefs.setHasSeenStartScreen()
+
+                        // Navigate and remove StartScreen from backstack
+                        navController.navigate(Screen.Scanner.route) {
+                            popUpTo(Screen.StartScreen.route) {
+                                inclusive = true
+                            }
                         }
                     }
+                )
+            }
+
+            // Scanner Screen
+            composable(Screen.Scanner.route) {
+                QrCodeMain(
+                    onGenerateClick = { navController.navigate("input_graph") {
+                        popUpTo(Screen.Scanner.route) {
+                            inclusive = true
+                        }
+                    } },
+                    onScannerClick = { },
+                    onHistoryClick = { navController.navigate(Screen.History.route) {
+                        popUpTo(Screen.Scanner.route) {
+                            inclusive = true
+                        }
+                    } }
+                ) {
+                    ScannerScreen(
+                        onResult = { scannerId ->
+                            navController.navigate("scan_result/$scannerId")
+                        },
+                        adViewModel = adViewModel
+                    )
                 }
+            }
+            // Scan Result Screen
+            composable("scan_result/{scannerId}") { backStackEntry ->
+                val scannerId = backStackEntry.arguments?.getString("scannerId")
+
+                if (scannerId != null) {
+                    historyItems.find { it.id == scannerId.toLong() }
+                    NewResultScreen(
+                        generateId = scannerId.toLong(),
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.History.route) {
+                QrCodeMain(
+                    onGenerateClick = { navController.navigate("input_graph") {
+                        popUpTo(Screen.History.route) {
+                            inclusive = true
+                        }
+                    } },
+                    onScannerClick = { navController.navigate(Screen.Scanner.route) {
+                        popUpTo(Screen.History.route) {
+                            inclusive = true
+                        }
+                    } },
+                    onHistoryClick = { }
+                ) {
+                    HistoryScreen(
+                        onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                        onItemClick = { item ->
+                            navController.navigate("detail/${item.id}")
+                            Log.d("HistoryHome", "onItemClick: ${item.id}")
+                        }
+                    )
+                }
+            }
+            composable(
+                route = "detail/{itemId}",
+                arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val itemId = backStackEntry.arguments?.getString("itemId")
+                if (!itemId.isNullOrBlank()) {
+                    val item = historyItems.find { it.id == itemId.toLong() }
+                    DetailScreen(
+                        item = item,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.Settings.route) {
+                SettingsScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            inputGraph(
+                navController = navController,
+                navigateToInputScreen = navigateToInputScreen,
+                onNavigateBackFromInput = { onNavigateBackFromInput() },
+                adViewModel = adViewModel
             )
         }
-
-        // Scanner Screen
-        composable(Screen.Scanner.route) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph") {
-                    popUpTo(Screen.Scanner.route) {
-                        inclusive = true
-                    }
-                } },
-                onScannerClick = { },
-                onHistoryClick = { navController.navigate(Screen.History.route) {
-                    popUpTo(Screen.Scanner.route) {
-                        inclusive = true
-                    }
-                } }
-            ) {
-                ScannerScreen(
-                    onResult = { scannerId ->
-                        navController.navigate("scan_result/$scannerId")
-                    },
-                    adViewModel = adViewModel
-                )
-            }
-        }
-        // Scan Result Screen
-        composable("scan_result/{scannerId}") { backStackEntry ->
-            val scannerId = backStackEntry.arguments?.getString("scannerId")
-
-            if (scannerId != null) {
-                historyItems.find { it.id == scannerId.toLong() }
-                NewResultScreen(
-                    generateId = scannerId.toLong(),
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-        }
-
-        composable(Screen.History.route) {
-            QrCodeMain(
-                onGenerateClick = { navController.navigate("input_graph") {
-                    popUpTo(Screen.History.route) {
-                        inclusive = true
-                    }
-                } },
-                onScannerClick = { navController.navigate(Screen.Scanner.route) {
-                    popUpTo(Screen.History.route) {
-                        inclusive = true
-                    }
-                } },
-                onHistoryClick = { }
-            ) {
-                HistoryScreen(
-                    onSettingsClick = { navController.navigate(Screen.Settings.route) },
-                    onItemClick = { item ->
-                        navController.navigate("detail/${item.id}")
-                        Log.d("HistoryHome", "onItemClick: ${item.id}")
-                    }
-                )
-            }
-        }
-        composable(
-            route = "detail/{itemId}",
-            arguments = listOf(navArgument("itemId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString("itemId")
-            if (!itemId.isNullOrBlank()) {
-                val item = historyItems.find { it.id == itemId.toLong() }
-                DetailScreen(
-                    item = item,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-        }
-
-        composable(Screen.Settings.route) {
-            SettingsScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        inputGraph(
-            navController = navController,
-            navigateToInputScreen = navigateToInputScreen,
-            onNavigateBackFromInput = { onNavigateBackFromInput() },
-            adViewModel = adViewModel
+        InAppUpdateHandler(
+            snackBarHostState = snackBarHostState,
+            snackBarCoroutineScope = snackBarCoroutineScope
         )
     }
 }

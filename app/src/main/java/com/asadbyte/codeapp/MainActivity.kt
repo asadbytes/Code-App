@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.InstallStatus
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -70,18 +71,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun InAppUpdateHandler() {
+fun InAppUpdateHandler(
+    snackBarHostState: SnackbarHostState,
+    snackBarCoroutineScope: CoroutineScope
+) {
     val context = LocalContext.current
     val appUpdateManager = AppUpdateManagerFactory.create(context)
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     // This listener is for flexible updates to know when the download is complete.
     val installStateUpdatedListener = remember {
         InstallStateUpdatedListener { state: InstallState ->
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
-                coroutineScope.launch {
-                    val result = snackbarHostState.showSnackbar(
+                snackBarCoroutineScope.launch {
+                    val result = snackBarHostState.showSnackbar(
                         message = "Update downloaded.",
                         actionLabel = "Restart",
                         duration = SnackbarDuration.Indefinite
@@ -143,5 +145,5 @@ fun InAppUpdateHandler() {
     }
 
     // Show the Snackbar
-    SnackbarHost(hostState = snackbarHostState)
+    SnackbarHost(hostState = snackBarHostState)
 }
