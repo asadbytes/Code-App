@@ -1,10 +1,12 @@
 package com.asadbyte.codeapp.ui.detail
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,10 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Launch
+import androidx.compose.material.icons.filled.Launch
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -201,6 +207,8 @@ fun DetailCard(
     imageBitmap: ImageBitmap
 ) {
     var showQRCode by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
 
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
@@ -250,21 +258,44 @@ fun DetailCard(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp) // Adjusted padding
             )
-            val scrollState = rememberScrollState()
-            Column(
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .height(92.dp) // Sets a fixed height (~3 lines)
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                    .verticalScroll(scrollState) // Makes the content scroll if it overflows
+                    .padding(vertical = 16.dp, horizontal = 20.dp)
             ) {
-                Text(
-                    text = item.content,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                    // maxLines and overflow are removed to allow for scrolling
-                )
+                // The scrollable text content
+                val scrollState = rememberScrollState()
+                Box(
+                    modifier = Modifier
+                        .height(72.dp)
+                        .weight(1f) // Takes up remaining space
+                        .verticalScroll(scrollState)
+                        .padding(end = 8.dp) // Add padding so the scrollbar doesn't overlap the icon
+                ) {
+                    Text(
+                        text = item.content,
+                        color = Color.White,
+                    )
+                }
+
+                // The static launch icon
+                if (isUrl) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Launch,
+                        contentDescription = "Open URL",
+                        tint = MyYellow,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.Top)
+                            .clickable {
+                                openUrl(context, item.content)
+                            }
+                    )
+                }
             }
+
             if (showQRCode) {
                 Image(
                     bitmap = imageBitmap,

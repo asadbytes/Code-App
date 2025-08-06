@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.asadbyte.codeapp.ui.AppNavigation
 import com.asadbyte.codeapp.ui.adsMob.AdViewModel
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition {
             adViewModel.uiState.value.isAppLoading
         }*/
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             /*adViewModel.handleInitialAppLoad(this)
             val uiState by adViewModel.uiState.collectAsStateWithLifecycle()*/

@@ -23,7 +23,7 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 import java.io.File
 import java.io.FileOutputStream
 
-private fun openUrl(context: Context, url: String) {
+fun openUrl(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     context.startActivity(intent)
 }

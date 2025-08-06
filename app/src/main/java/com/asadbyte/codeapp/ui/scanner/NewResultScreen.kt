@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -65,9 +66,13 @@ import com.asadbyte.codeapp.ui.theme.MyYellow
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Launch
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.navigation.NavController
+import com.asadbyte.codeapp.ui.detail.openUrl
 import kotlinx.coroutines.delay
 
 @Composable
@@ -208,14 +213,14 @@ private fun ScreenContent(
                     )
                 }
             ) { some ->
-                if(some)
-                Image(
-                    painter = painterResource(id = R.drawable.ic_back_no_bg),
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable { onBackClick() }
-                )
+                if (some)
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_back_no_bg),
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { onBackClick() }
+                    )
             }
 
             Spacer(Modifier.width(16.dp))
@@ -234,12 +239,12 @@ private fun ScreenContent(
                 }
             ) { some ->
                 if (some)
-                Text(
-                    text = "Result",
-                    fontFamily = ItimFont,
-                    fontSize = 35.sp,
-                    color = Color.White,
-                )
+                    Text(
+                        text = "Result",
+                        fontFamily = ItimFont,
+                        fontSize = 35.sp,
+                        color = Color.White,
+                    )
             }
         }
 
@@ -324,6 +329,9 @@ private fun ScreenContent(
 fun ResultCard(
     item: HistoryItem
 ) {
+    val context = LocalContext.current
+    val isUrl = remember { Patterns.WEB_URL.matcher(item.content).matches() }
+
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
@@ -349,24 +357,51 @@ fun ResultCard(
             )
 
             // --- IMPROVEMENT: Made the text area scrollable as requested ---
-            val scrollState = rememberScrollState()
-            Column(
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .height(72.dp) // Sets a fixed height (~3 lines)
                     .fillMaxWidth()
-                    .verticalScroll(scrollState) // Makes the content scroll if it overflows
+                    .padding(vertical = 16.dp, horizontal = 20.dp)
             ) {
-                Text(
-                    text = item.content,
-                    color = Color.White,
-                    // maxLines and overflow are removed to allow for scrolling
-                )
+                // The scrollable text content
+                val scrollState = rememberScrollState()
+                Box(
+                    modifier = Modifier
+                        .height(72.dp)
+                        .weight(1f) // Takes up remaining space
+                        .verticalScroll(scrollState)
+                        .padding(end = 8.dp) // Add padding so the scrollbar doesn't overlap the icon
+                ) {
+                    Text(
+                        text = item.content,
+                        color = Color.White,
+                    )
+                }
+
+                // The static launch icon
+                if (isUrl) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Launch,
+                        contentDescription = "Open URL",
+                        tint = MyYellow,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.Top)
+                            .clickable {
+                                openUrl(context, item.content)
+                            }
+                    )
+                }
             }
         }
     }
 }
 
-fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCode_${System.currentTimeMillis()}") {
+fun saveBitmapToGallery(
+    context: Context,
+    bitmap: Bitmap,
+    title: String = "QRCode_${System.currentTimeMillis()}"
+) {
 
     val enhancedBitmap = enhanceQRCodeForSharing(bitmap)
 
@@ -379,7 +414,8 @@ fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String = "QRCod
     }
 
     val contentResolver = context.contentResolver
-    val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    val imageUri: Uri? =
+        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
     if (imageUri != null) {
         contentResolver.openOutputStream(imageUri).use { outputStream ->
@@ -417,7 +453,7 @@ private fun ResultPreview() {
                     contentDescription = null,
                     modifier = Modifier
                         .size(32.dp)
-                        .clickable {  }
+                        .clickable { }
                 )
                 Text(
                     text = "Result",
@@ -426,13 +462,14 @@ private fun ResultPreview() {
                     color = Color.White
                 )
             }
-            ResultCard(item = HistoryItem(
-                id = 1,
-                content = "Hello World",
-                type = ItemType.SCAN,
-                timestamp = System.currentTimeMillis(),
-                isFavorite = false
-            )
+            ResultCard(
+                item = HistoryItem(
+                    id = 1,
+                    content = "Hello World",
+                    type = ItemType.SCAN,
+                    timestamp = System.currentTimeMillis(),
+                    isFavorite = false
+                )
             )
             Image(
                 painter = painterResource(R.drawable.ic_start_screen_qrcode),
@@ -450,9 +487,9 @@ private fun ResultPreview() {
                 DetailButton(
                     imageRes = R.drawable.ic_detail_share,
                     text = "Share",
-                    onClick = {  }
+                    onClick = { }
                 )
-                if(true) {
+                if (true) {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_copy,
                         text = "Copy",
@@ -462,7 +499,7 @@ private fun ResultPreview() {
                     DetailButton(
                         imageRes = R.drawable.ic_detail_save,
                         text = "Save",
-                        onClick = {  }
+                        onClick = { }
                     )
                 }
             }

@@ -3,7 +3,10 @@ package com.asadbyte.codeapp.ui
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -99,10 +102,14 @@ fun AppNavigation(adViewModel: AdViewModel) {
         navController.popBackStack()
     }
 
+    val systemBarPaddingModifier = Modifier
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         composable(Screen.StartScreen.route) {
             StartScreen(

@@ -123,4 +123,6 @@ dependencies {
 
     // guava
     implementation("com.google.guava:guava:31.1-android")
+    // icons extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }
