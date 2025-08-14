@@ -2,6 +2,7 @@ package com.asadbyte.codeapp.ui.adsMob
 
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,23 +26,23 @@ fun NativeAdView(nativeAd: NativeAd, modifier: Modifier = Modifier) {
         factory = {
             // Create Views Programmatically
             val adIcon = ImageView(context)
-            adIcon.id = 1 // Assign unique IDs for a potential state restoration
+            adIcon.id = View.generateViewId() // Assign unique IDs for a potential state restoration
 
             val adHeadline = TextView(context).apply {
-                id = 2
+                id = View.generateViewId()
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                 setTextColor(Color.Black.toArgb())
                 // You can also set typefaces here
             }
 
             val adBody = TextView(context).apply {
-                id = 3
+                id = View.generateViewId()
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                 setTextColor(Color.Gray.toArgb())
             }
 
             val adCallToAction = Button(context).apply {
-                id = 4
+                id = View.generateViewId()
                 gravity = Gravity.CENTER
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                 // You would typically set a background drawable for the button
